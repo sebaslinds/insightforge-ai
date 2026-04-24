@@ -1,0 +1,9 @@
+fastapi
+beautifulsoup4
+google-genai
+pandas
+psycopg2-binary
+pytest
+requests
+sqlalchemy
+uvicorn

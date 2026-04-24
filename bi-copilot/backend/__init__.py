@@ -1,0 +1,1 @@
+"""BI Copilot backend package."""

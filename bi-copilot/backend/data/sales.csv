@@ -1,0 +1,13 @@
+id,product,category,price,quantity,date,customer_id
+1,Laptop Pro 14,Computers,1499.00,2,2026-01-05,C-1001
+2,Noise Canceling Headphones,Audio,249.00,5,2026-01-06,C-1002
+3,USB-C Hub,Accessories,79.00,9,2026-01-07,C-1003
+4,Laptop Pro 14,Computers,1499.00,1,2026-01-08,C-1004
+5,Mechanical Keyboard,Accessories,139.00,6,2026-01-09,C-1005
+6,4K Monitor,Displays,399.00,4,2026-01-10,C-1006
+7,Wireless Mouse,Accessories,59.00,12,2026-01-11,C-1007
+8,Studio Microphone,Audio,189.00,3,2026-01-12,C-1008
+9,4K Monitor,Displays,399.00,5,2026-01-13,C-1009
+10,Laptop Pro 14,Computers,1499.00,3,2026-01-14,C-1010
+11,Tablet Air,Computers,699.00,4,2026-01-15,C-1011
+12,Noise Canceling Headphones,Audio,249.00,7,2026-01-16,C-1012
