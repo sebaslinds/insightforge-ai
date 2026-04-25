@@ -7,9 +7,11 @@ from google import genai
 try:
     from config import get_settings
     from errors import AIServiceError, ConfigurationError
+    from services.query_service import validate_read_only_sql
 except ModuleNotFoundError:
     from backend.config import get_settings
     from backend.errors import AIServiceError, ConfigurationError
+    from backend.services.query_service import validate_read_only_sql
 
 
 logger = logging.getLogger(__name__)
@@ -71,9 +73,10 @@ def _validate_sql(sql: str) -> None:
     if not sql:
         raise AIServiceError("Gemini returned an empty SQL response.")
 
-    first_token = sql.split(maxsplit=1)[0].lower()
-    if first_token not in {"select", "with"}:
-        raise AIServiceError("Gemini returned a non-read-only SQL statement.")
+    try:
+        validate_read_only_sql(sql)
+    except Exception as exc:
+        raise AIServiceError("Gemini returned unsafe SQL.") from exc
 
 
 def _get_gemini_client() -> genai.Client:

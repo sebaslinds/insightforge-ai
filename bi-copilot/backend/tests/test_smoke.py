@@ -1,8 +1,9 @@
 import pytest
 from fastapi.testclient import TestClient
 
+import ai
 import main
-from errors import QueryExecutionError
+from errors import AIServiceError, QueryExecutionError
 from scripts.seed_db import seed
 from services.query_service import run_query
 from services.scraper_service import ScrapedProduct
@@ -20,6 +21,7 @@ def test_health() -> None:
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
+    assert response.headers["X-Request-ID"]
 
 
 def test_ask_with_mocked_gemini(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -87,6 +89,25 @@ def test_run_query_normalizes_scraped_demo_product_filter(monkeypatch: pytest.Mo
 def test_run_query_blocks_unsafe_sql(sql: str) -> None:
     with pytest.raises(QueryExecutionError):
         run_query(sql)
+
+
+def test_ai_sql_validation_blocks_unsafe_generated_sql() -> None:
+    with pytest.raises(AIServiceError):
+        ai._validate_sql("SELECT * FROM sales; DROP TABLE sales;")
+
+
+def test_app_errors_include_request_id(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = TestClient(main.app)
+
+    monkeypatch.setattr(main, "generate_sql", lambda question: "DROP TABLE sales;")
+
+    response = client.post("/ask", json={"question": "Delete everything"})
+
+    assert response.status_code == 400
+    payload = response.json()
+    assert payload["detail"] == "Unable to execute SQL query."
+    assert payload["request_id"]
+    assert response.headers["X-Request-ID"] == payload["request_id"]
 
 
 def test_scrape_demo_ingests_products(monkeypatch: pytest.MonkeyPatch) -> None:

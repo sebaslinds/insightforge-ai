@@ -40,7 +40,7 @@ BLOCKED_SQL_PATTERN = re.compile(
 SQL_COMMENT_PATTERN = re.compile(r"(--|/\*)")
 
 
-def _validate_read_only_sql(sql: str) -> None:
+def validate_read_only_sql(sql: str) -> None:
     normalized = sql.strip().rstrip(";")
     if not normalized:
         raise QueryExecutionError("SQL query must not be empty.")
@@ -95,7 +95,7 @@ def _rows_to_records(rows: list[Any]) -> list[dict[str, Any]]:
 def run_query(sql: str) -> list[dict[str, Any]]:
     """Execute read-only SQL against the configured database."""
     sql = _normalize_known_ai_sql(sql)
-    _validate_read_only_sql(sql)
+    validate_read_only_sql(sql)
     init_db()
 
     try:

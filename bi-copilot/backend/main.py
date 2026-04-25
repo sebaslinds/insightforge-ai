@@ -1,4 +1,6 @@
 import logging
+import time
+from uuid import uuid4
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -50,20 +52,74 @@ app.add_middleware(
 
 @app.exception_handler(AppError)
 async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
-    logger.warning("%s %s failed: %s", request.method, request.url.path, exc)
+    request_id = getattr(request.state, "request_id", "-")
+    logger.warning(
+        "request_failed request_id=%s method=%s path=%s status_code=%s error=%s",
+        request_id,
+        request.method,
+        request.url.path,
+        exc.status_code,
+        exc,
+    )
     return JSONResponse(
         status_code=exc.status_code,
-        content={"detail": exc.public_message},
+        content={"detail": exc.public_message, "request_id": request_id},
     )
 
 
 @app.exception_handler(Exception)
 async def unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
-    logger.exception("Unhandled error on %s %s", request.method, request.url.path)
+    request_id = getattr(request.state, "request_id", "-")
+    logger.exception(
+        "unhandled_error request_id=%s method=%s path=%s",
+        request_id,
+        request.method,
+        request.url.path,
+    )
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error."},
+        content={"detail": "Internal server error.", "request_id": request_id},
     )
+
+
+@app.middleware("http")
+async def request_logging_middleware(request: Request, call_next):
+    request_id = str(uuid4())
+    request.state.request_id = request_id
+    start_time = time.perf_counter()
+
+    logger.info(
+        "request_started request_id=%s method=%s path=%s client=%s",
+        request_id,
+        request.method,
+        request.url.path,
+        request.client.host if request.client else "-",
+    )
+
+    try:
+        response = await call_next(request)
+    except Exception:
+        duration_ms = (time.perf_counter() - start_time) * 1000
+        logger.exception(
+            "request_error request_id=%s method=%s path=%s duration_ms=%.2f",
+            request_id,
+            request.method,
+            request.url.path,
+            duration_ms,
+        )
+        raise
+
+    duration_ms = (time.perf_counter() - start_time) * 1000
+    response.headers["X-Request-ID"] = request_id
+    logger.info(
+        "request_finished request_id=%s method=%s path=%s status_code=%s duration_ms=%.2f",
+        request_id,
+        request.method,
+        request.url.path,
+        response.status_code,
+        duration_ms,
+    )
+    return response
 
 
 def answer_question(question: str) -> AskResponse:
