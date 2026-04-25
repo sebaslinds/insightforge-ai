@@ -18,7 +18,8 @@ body {
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
 }
 
@@ -32,12 +33,20 @@ input {
   margin: 0 auto;
 }
 
-.header {
+.platform-header,
+.module-header {
   display: flex;
   align-items: end;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 24px;
+}
+
+.platform-header {
+  margin-bottom: 28px;
+}
+
+.module-header {
+  margin-bottom: 18px;
 }
 
 .eyebrow {
@@ -67,8 +76,43 @@ h1 {
 h2 {
   margin-bottom: 0;
   color: #111827;
-  font-size: 1rem;
+  font-size: 1.45rem;
   line-height: 1.3;
+}
+
+.panel h2 {
+  font-size: 1rem;
+}
+
+.module-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(132px, 1fr));
+  gap: 6px;
+  border: 1px solid #d3d8e4;
+  border-radius: 8px;
+  padding: 4px;
+  background: #ffffff;
+}
+
+.module-tabs button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 14px;
+  color: #586174;
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.module-tabs button.active {
+  color: #ffffff;
+  background: #172033;
+}
+
+.module-view {
+  display: grid;
+  gap: 0;
 }
 
 .ask-form {
@@ -94,7 +138,8 @@ h2 {
   box-shadow: 0 0 0 3px rgb(37 99 235 / 14%);
 }
 
-.ask-form button {
+.ask-form button,
+.form-actions button {
   min-width: 116px;
   min-height: 52px;
   border: 0;
@@ -106,7 +151,8 @@ h2 {
   cursor: pointer;
 }
 
-.ask-form button:disabled {
+.ask-form button:disabled,
+.form-actions button:disabled {
   background: #8aa8ef;
   cursor: wait;
 }
@@ -170,6 +216,11 @@ h2 {
 .insight-panel {
   border-color: #c9d8ff;
   background: #f8fbff;
+}
+
+.sentinel-summary {
+  border-color: #bbf7d0;
+  background: #f7fef9;
 }
 
 .insight-panel p {
@@ -268,13 +319,71 @@ td {
   font-size: 0.86rem;
 }
 
+.sentinel {
+  color: #047857;
+}
+
+.sentinel-form {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.sentinel-form label {
+  color: #586174;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.sentinel-form textarea {
+  width: 100%;
+  min-height: 118px;
+  resize: vertical;
+  border: 1px solid #d3d8e4;
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: #111827;
+  background: #ffffff;
+  line-height: 1.55;
+  outline: none;
+}
+
+.sentinel-form textarea:focus {
+  border-color: #047857;
+  box-shadow: 0 0 0 3px rgb(4 120 87 / 14%);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.form-actions button:first-child {
+  border: 1px solid #d3d8e4;
+  color: #172033;
+  background: #ffffff;
+}
+
+.form-actions button:first-child:disabled {
+  color: #8a94a8;
+  background: #ffffff;
+}
+
 @media (max-width: 780px) {
   .app-shell {
     padding: 28px 14px;
   }
 
-  .header {
+  .platform-header,
+  .module-header {
     display: block;
+  }
+
+  .module-tabs {
+    margin-top: 18px;
+    grid-template-columns: 1fr;
   }
 
   .ask-form,
@@ -282,8 +391,13 @@ td {
     grid-template-columns: 1fr;
   }
 
-  .ask-form button {
+  .ask-form button,
+  .form-actions button {
     width: 100%;
+  }
+
+  .form-actions {
+    display: grid;
   }
 
   .examples {

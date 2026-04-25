@@ -14,13 +14,53 @@ import {
 import "./styles.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const SENTINEL_API_BASE_URL =
+  import.meta.env.VITE_SENTINEL_API_BASE_URL || "http://localhost:8001";
 const EXAMPLE_QUESTIONS = [
   "Top products by revenue",
   "Revenue by category",
   "Which products have the lowest revenue?",
 ];
+const EXAMPLE_SERIES = "10, 12, 11, 13, 100, 12, 11, 200, 9";
 
 function App() {
+  const [activeModule, setActiveModule] = useState("bi");
+
+  return (
+    <main className="app-shell">
+      <section className="workspace">
+        <header className="platform-header">
+          <div>
+            <p className="eyebrow">InsightForge AI</p>
+            <h1>Data intelligence workspace</h1>
+          </div>
+          <nav className="module-tabs" aria-label="InsightForge modules">
+            <button
+              type="button"
+              className={activeModule === "bi" ? "active" : ""}
+              onClick={() => setActiveModule("bi")}
+            >
+              BI Copilot
+            </button>
+            <button
+              type="button"
+              className={activeModule === "sentinel" ? "active" : ""}
+              onClick={() => setActiveModule("sentinel")}
+            >
+              Data Sentinel
+            </button>
+          </nav>
+        </header>
+
+        {activeModule === "bi" ? <BiCopilot /> : <DataSentinel />}
+
+        <footer className="footer">Powered by Gemini, FastAPI, Scikit-learn, and Recharts.</footer>
+      </section>
+    </main>
+  );
+}
+
+function BiCopilot() {
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -79,81 +119,220 @@ function App() {
   }
 
   return (
-    <main className="app-shell">
-      <section className="workspace">
-        <header className="header">
-          <div>
-            <p className="eyebrow">BI Copilot</p>
-            <h1>Ask questions about e-commerce sales</h1>
-          </div>
-        </header>
-
-        <form className="ask-form" onSubmit={handleSubmit}>
-          <input
-            aria-label="Business question"
-            value={question}
-            onChange={(event) => setQuestion(event.target.value)}
-            placeholder="Show product revenue"
-          />
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? "Analyzing..." : "Ask"}
-          </button>
-        </form>
-
-        <div className="examples" aria-label="Example questions">
-          {EXAMPLE_QUESTIONS.map((example) => (
-            <button
-              key={example}
-              type="button"
-              onClick={() => askQuestion(example)}
-              disabled={isLoading}
-            >
-              {example}
-            </button>
-          ))}
+    <section className="module-view">
+      <header className="module-header">
+        <div>
+          <p className="eyebrow">BI Copilot</p>
+          <h2>Ask questions about e-commerce sales</h2>
         </div>
+      </header>
 
-        {error && <p className="error">{error}</p>}
+      <form className="ask-form" onSubmit={handleSubmit}>
+        <input
+          aria-label="Business question"
+          value={question}
+          onChange={(event) => setQuestion(event.target.value)}
+          placeholder="Show product revenue"
+        />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Analyzing..." : "Ask"}
+        </button>
+      </form>
 
-        {result && (
-          <section className="results" aria-live="polite">
-            <section className="insight-panel">
-              <span>AI Insight</span>
-              <p>{cleanInsight(result.insight)}</p>
+      <div className="examples" aria-label="Example questions">
+        {EXAMPLE_QUESTIONS.map((example) => (
+          <button
+            key={example}
+            type="button"
+            onClick={() => askQuestion(example)}
+            disabled={isLoading}
+          >
+            {example}
+          </button>
+        ))}
+      </div>
+
+      {error && <p className="error">{error}</p>}
+
+      {result && (
+        <section className="results" aria-live="polite">
+          <section className="insight-panel">
+            <span>AI Insight</span>
+            <p>{cleanInsight(result.insight)}</p>
+          </section>
+
+          <div className="sql-panel">
+            <span>Generated SQL</span>
+            <pre>{result.sql}</pre>
+          </div>
+
+          <div className="visual-grid">
+            <section className="panel">
+              <div className="panel-header">
+                <h2>{getChartTitle(result.chart)}</h2>
+              </div>
+              <div className="chart-wrap">
+                {chartData.length > 0 && result.chart?.type !== "table" ? (
+                  <ChartRenderer chart={result.chart} data={chartData} />
+                ) : (
+                  <p className="empty-state">No chartable fields returned.</p>
+                )}
+              </div>
             </section>
 
-            <div className="sql-panel">
-              <span>Generated SQL</span>
-              <pre>{result.sql}</pre>
-            </div>
+            <section className="panel">
+              <div className="panel-header">
+                <h2>Results</h2>
+              </div>
+              <DataTable rows={result.data} />
+            </section>
+          </div>
+        </section>
+      )}
+    </section>
+  );
+}
 
-            <div className="visual-grid">
-              <section className="panel">
-                <div className="panel-header">
-                  <h2>{getChartTitle(result.chart)}</h2>
-                </div>
-                <div className="chart-wrap">
-                  {chartData.length > 0 && result.chart?.type !== "table" ? (
-                    <ChartRenderer chart={result.chart} data={chartData} />
-                  ) : (
-                    <p className="empty-state">No chartable fields returned.</p>
-                  )}
-                </div>
-              </section>
+function DataSentinel() {
+  const [series, setSeries] = useState(EXAMPLE_SERIES);
+  const [result, setResult] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-              <section className="panel">
-                <div className="panel-header">
-                  <h2>Results</h2>
-                </div>
-                <DataTable rows={result.data} />
-              </section>
-            </div>
+  const parsedSeries = useMemo(() => parseSeries(series), [series]);
+  const anomalySet = useMemo(() => new Set(result?.anomalies || []), [result]);
+  const chartData = useMemo(
+    () =>
+      parsedSeries.map((value, index) => ({
+        index: index + 1,
+        value,
+        anomaly: anomalySet.has(value) ? value : null,
+      })),
+    [anomalySet, parsedSeries],
+  );
+
+  async function detectAnomalies(event) {
+    event.preventDefault();
+
+    if (!parsedSeries.length) {
+      setError("Enter at least one numeric value.");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(`${SENTINEL_API_BASE_URL}/detect`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ data: parsedSeries }),
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.detail || "Unable to detect anomalies.");
+      }
+
+      setResult(payload);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <section className="module-view">
+      <header className="module-header">
+        <div>
+          <p className="eyebrow sentinel">Data Sentinel</p>
+          <h2>Detect unusual values in a numeric series</h2>
+        </div>
+      </header>
+
+      <form className="sentinel-form" onSubmit={detectAnomalies}>
+        <label htmlFor="series-input">Numeric series</label>
+        <textarea
+          id="series-input"
+          value={series}
+          onChange={(event) => setSeries(event.target.value)}
+          rows={4}
+        />
+        <div className="form-actions">
+          <button type="button" onClick={() => setSeries(EXAMPLE_SERIES)} disabled={isLoading}>
+            Example
+          </button>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Scanning..." : "Detect"}
+          </button>
+        </div>
+      </form>
+
+      {error && <p className="error">{error}</p>}
+
+      {result && (
+        <section className="results" aria-live="polite">
+          <section className="insight-panel sentinel-summary">
+            <span>Anomaly Summary</span>
+            <p>
+              {result.anomalies.length
+                ? `${result.anomalies.length} anomalous value${
+                    result.anomalies.length > 1 ? "s" : ""
+                  } detected: ${result.anomalies.join(", ")}.`
+                : "No anomalous values were detected."}
+            </p>
           </section>
-        )}
 
-        <footer className="footer">Powered by Gemini, FastAPI, PostgreSQL, and Recharts.</footer>
-      </section>
-    </main>
+          <div className="visual-grid">
+            <section className="panel">
+              <div className="panel-header">
+                <h2>Signal</h2>
+              </div>
+              <div className="chart-wrap">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData} margin={{ top: 12, right: 12, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="index" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#2563eb"
+                      strokeWidth={3}
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="anomaly"
+                      stroke="#dc2626"
+                      strokeWidth={0}
+                      dot={{ r: 6, fill: "#dc2626", strokeWidth: 0 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </section>
+
+            <section className="panel">
+              <div className="panel-header">
+                <h2>Values</h2>
+              </div>
+              <DataTable
+                rows={chartData.map((row) => ({
+                  index: row.index,
+                  value: row.value,
+                  status: row.anomaly === null ? "normal" : "anomaly",
+                }))}
+              />
+            </section>
+          </div>
+        </section>
+      )}
+    </section>
   );
 }
 
@@ -183,6 +362,15 @@ function ChartRenderer({ chart, data }) {
       </BarChart>
     </ResponsiveContainer>
   );
+}
+
+function parseSeries(value) {
+  return value
+    .split(/[\s,;]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map(Number)
+    .filter((item) => Number.isFinite(item));
 }
 
 function getChartTitle(chart) {
