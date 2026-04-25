@@ -86,7 +86,7 @@ h2 {
 
 .module-tabs {
   display: grid;
-  grid-template-columns: repeat(2, minmax(132px, 1fr));
+  grid-template-columns: repeat(3, minmax(118px, 1fr));
   gap: 6px;
   border: 1px solid #d3d8e4;
   border-radius: 8px;
@@ -113,6 +113,130 @@ h2 {
 .module-view {
   display: grid;
   gap: 0;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.service-card {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+
+.service-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.service-topline h2 {
+  font-size: 1.1rem;
+}
+
+.status-pill {
+  min-width: 82px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: #475467;
+  background: #eef1f6;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.status-pill.online {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.status-pill.offline {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.service-card p {
+  min-height: 72px;
+  margin-bottom: 0;
+  color: #586174;
+  line-height: 1.55;
+}
+
+.service-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.service-actions button,
+.service-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.service-actions button {
+  border: 0;
+  color: #ffffff;
+  background: #2563eb;
+  cursor: pointer;
+}
+
+.service-actions a {
+  border: 1px solid #d3d8e4;
+  color: #172033;
+  background: #ffffff;
+}
+
+.workflow-panel {
+  overflow: hidden;
+}
+
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+}
+
+.workflow-steps div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  border-right: 1px solid #eef1f6;
+  padding: 16px;
+}
+
+.workflow-steps div:last-child {
+  border-right: 0;
+}
+
+.workflow-steps span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #172033;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.workflow-steps p {
+  margin-bottom: 0;
+  color: #586174;
+  line-height: 1.45;
 }
 
 .ask-form {
@@ -387,8 +511,19 @@ td {
   }
 
   .ask-form,
-  .visual-grid {
+  .visual-grid,
+  .overview-grid,
+  .workflow-steps {
     grid-template-columns: 1fr;
+  }
+
+  .workflow-steps div {
+    border-right: 0;
+    border-bottom: 1px solid #eef1f6;
+  }
+
+  .workflow-steps div:last-child {
+    border-bottom: 0;
   }
 
   .ask-form button,

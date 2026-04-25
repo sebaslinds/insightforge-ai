@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Bar,
@@ -24,7 +24,7 @@ const EXAMPLE_QUESTIONS = [
 const EXAMPLE_SERIES = "10, 12, 11, 13, 100, 12, 11, 200, 9";
 
 function App() {
-  const [activeModule, setActiveModule] = useState("bi");
+  const [activeModule, setActiveModule] = useState("overview");
 
   return (
     <main className="app-shell">
@@ -35,6 +35,13 @@ function App() {
             <h1>Data intelligence workspace</h1>
           </div>
           <nav className="module-tabs" aria-label="InsightForge modules">
+            <button
+              type="button"
+              className={activeModule === "overview" ? "active" : ""}
+              onClick={() => setActiveModule("overview")}
+            >
+              Overview
+            </button>
             <button
               type="button"
               className={activeModule === "bi" ? "active" : ""}
@@ -52,11 +59,121 @@ function App() {
           </nav>
         </header>
 
-        {activeModule === "bi" ? <BiCopilot /> : <DataSentinel />}
+        {activeModule === "overview" && <PlatformOverview setActiveModule={setActiveModule} />}
+        {activeModule === "bi" && <BiCopilot />}
+        {activeModule === "sentinel" && <DataSentinel />}
 
         <footer className="footer">Powered by Gemini, FastAPI, Scikit-learn, and Recharts.</footer>
       </section>
     </main>
+  );
+}
+
+function PlatformOverview({ setActiveModule }) {
+  const [services, setServices] = useState({
+    bi: { label: "BI Copilot API", status: "checking" },
+    sentinel: { label: "Data Sentinel API", status: "checking" },
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function checkService(key, url) {
+      try {
+        const response = await fetch(`${url}/health`);
+        if (!response.ok) {
+          throw new Error("Health check failed.");
+        }
+        if (isMounted) {
+          setServices((current) => ({
+            ...current,
+            [key]: { ...current[key], status: "online" },
+          }));
+        }
+      } catch {
+        if (isMounted) {
+          setServices((current) => ({
+            ...current,
+            [key]: { ...current[key], status: "offline" },
+          }));
+        }
+      }
+    }
+
+    checkService("bi", API_BASE_URL);
+    checkService("sentinel", SENTINEL_API_BASE_URL);
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  return (
+    <section className="module-view">
+      <header className="module-header">
+        <div>
+          <p className="eyebrow">Platform Overview</p>
+          <h2>One workspace for data exploration and monitoring</h2>
+        </div>
+      </header>
+
+      <div className="overview-grid">
+        <ServiceCard
+          title="BI Copilot"
+          description="Ask business questions, generate read-only SQL, and turn sales data into charts and insights."
+          status={services.bi.status}
+          docsUrl={`${API_BASE_URL}/docs`}
+          onOpen={() => setActiveModule("bi")}
+        />
+        <ServiceCard
+          title="Data Sentinel"
+          description="Scan numeric signals for unusual values using Isolation Forest anomaly detection."
+          status={services.sentinel.status}
+          docsUrl={`${SENTINEL_API_BASE_URL}/docs`}
+          onOpen={() => setActiveModule("sentinel")}
+        />
+      </div>
+
+      <section className="panel workflow-panel">
+        <div className="panel-header">
+          <h2>Platform Flow</h2>
+        </div>
+        <div className="workflow-steps">
+          <div>
+            <span>1</span>
+            <p>Explore sales performance with natural language questions.</p>
+          </div>
+          <div>
+            <span>2</span>
+            <p>Review generated SQL, tables, charts, and AI insight.</p>
+          </div>
+          <div>
+            <span>3</span>
+            <p>Monitor numeric signals and flag anomalous values.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function ServiceCard({ title, description, status, docsUrl, onOpen }) {
+  return (
+    <section className="panel service-card">
+      <div className="service-topline">
+        <h2>{title}</h2>
+        <span className={`status-pill ${status}`}>{formatStatus(status)}</span>
+      </div>
+      <p>{description}</p>
+      <div className="service-actions">
+        <button type="button" onClick={onOpen}>
+          Open
+        </button>
+        <a href={docsUrl} target="_blank" rel="noreferrer">
+          API Docs
+        </a>
+      </div>
+    </section>
   );
 }
 
@@ -425,6 +542,16 @@ function DataTable({ rows }) {
       </table>
     </div>
   );
+}
+
+function formatStatus(status) {
+  if (status === "online") {
+    return "Online";
+  }
+  if (status === "offline") {
+    return "Offline";
+  }
+  return "Checking";
 }
 
 createRoot(document.getElementById("root")).render(<App />);
