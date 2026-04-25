@@ -3,6 +3,7 @@ beautifulsoup4
 google-genai
 pandas
 psycopg2-binary
+python-dotenv
 pytest
 requests
 sqlalchemy

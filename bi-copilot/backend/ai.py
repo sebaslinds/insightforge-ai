@@ -93,6 +93,8 @@ def generate_sql(question: str) -> str:
             model=settings.gemini_model,
             contents=_build_sql_prompt(question),
         )
+    except ConfigurationError:
+        raise
     except Exception as exc:
         logger.exception("Gemini request failed")
         raise AIServiceError("Gemini request failed.") from exc
@@ -117,6 +119,8 @@ def generate_insight(data: list[dict[str, Any]]) -> str:
             model=settings.gemini_model,
             contents=_build_insight_prompt(data),
         )
+    except ConfigurationError:
+        raise
     except Exception as exc:
         logger.exception("Gemini insight request failed")
         raise AIServiceError("Gemini failed to generate insights.") from exc
