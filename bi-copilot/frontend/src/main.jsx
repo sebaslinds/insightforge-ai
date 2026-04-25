@@ -183,6 +183,7 @@ function BiCopilot() {
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [chartExplanation, setChartExplanation] = useState("");
 
   const chartData = useMemo(() => {
     if (!result?.data || !result?.chart?.x || !result?.chart?.y) {
@@ -208,6 +209,7 @@ function BiCopilot() {
     setQuestion(trimmedQuestion);
     setIsLoading(true);
     setError("");
+    setChartExplanation("");
 
     try {
       const response = await fetch(`${API_BASE_URL}/ask`, {
@@ -234,6 +236,12 @@ function BiCopilot() {
   async function handleSubmit(event) {
     event.preventDefault();
     await askQuestion();
+  }
+
+  const kpis = useMemo(() => getBiKpis(result), [result]);
+
+  function explainChart() {
+    setChartExplanation(buildChartExplanation(result, chartData));
   }
 
   return (
@@ -272,8 +280,12 @@ function BiCopilot() {
 
       {error && <p className="error">{error}</p>}
 
+      {isLoading && <LoadingPanel label="Generating SQL, querying data, and preparing insight." />}
+
       {result && (
         <section className="results" aria-live="polite">
+          <KpiGrid items={kpis} />
+
           <section className="insight-panel">
             <span>AI Insight</span>
             <p>{cleanInsight(result.insight)}</p>
@@ -288,6 +300,9 @@ function BiCopilot() {
             <section className="panel">
               <div className="panel-header">
                 <h2>{getChartTitle(result.chart)}</h2>
+                <button type="button" className="ghost-action" onClick={explainChart}>
+                  Explain this chart
+                </button>
               </div>
               <div className="chart-wrap">
                 {chartData.length > 0 && result.chart?.type !== "table" ? (
@@ -305,6 +320,13 @@ function BiCopilot() {
               <DataTable rows={result.data} />
             </section>
           </div>
+
+          {chartExplanation && (
+            <section className="insight-panel chart-explanation">
+              <span>Chart Explanation</span>
+              <p>{chartExplanation}</p>
+            </section>
+          )}
         </section>
       )}
     </section>
@@ -344,6 +366,7 @@ function DataSentinel() {
     },
     [parsedSeries, result],
   );
+  const sentinelKpis = useMemo(() => getSentinelKpis(result, chartData), [chartData, result]);
 
   async function detectAnomalies(event) {
     event.preventDefault();
@@ -407,8 +430,12 @@ function DataSentinel() {
 
       {error && <p className="error">{error}</p>}
 
+      {isLoading && <LoadingPanel label="Scoring the signal and preparing anomaly details." />}
+
       {result && (
         <section className="results" aria-live="polite">
+          <KpiGrid items={sentinelKpis} />
+
           <section className="insight-panel sentinel-summary">
             <span>Anomaly Summary</span>
             <p>
@@ -526,6 +553,29 @@ function ChartRenderer({ chart, data }) {
   );
 }
 
+function KpiGrid({ items }) {
+  return (
+    <section className="kpi-grid" aria-label="Key performance indicators">
+      {items.map((item) => (
+        <div className="kpi-card" key={item.label}>
+          <span>{item.label}</span>
+          <strong>{item.value}</strong>
+          <p>{item.detail}</p>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function LoadingPanel({ label }) {
+  return (
+    <section className="panel loading-panel" aria-live="polite">
+      <div className="loading-spinner" />
+      <p>{label}</p>
+    </section>
+  );
+}
+
 function formatAnomalyLabel(anomaly) {
   const value = Number(anomaly.value).toString();
   return anomaly.timestamp ? `${value} at ${anomaly.timestamp}` : value;
@@ -561,6 +611,104 @@ function parseSentinelInput(value) {
     .filter(Boolean)
     .map(Number)
     .filter((item) => Number.isFinite(item));
+}
+
+function getBiKpis(result) {
+  if (!result?.data?.length) {
+    return [
+      { label: "Rows", value: "0", detail: "No result rows yet" },
+      { label: "Revenue", value: "$0", detail: "Ask a revenue question" },
+      { label: "Chart", value: "Pending", detail: "No visualization selected" },
+    ];
+  }
+
+  const rows = result.data;
+  const revenueTotal = sumNumericField(rows, "revenue");
+  const hasRevenue = rows.some((row) => Number.isFinite(Number(row.revenue)));
+  const topRow = rows[0] || {};
+  const topLabel = topRow.product || topRow.category || topRow.date || "Top row";
+
+  return [
+    {
+      label: "Rows",
+      value: formatNumber(rows.length),
+      detail: "Returned from SQL",
+    },
+    {
+      label: "Revenue",
+      value: hasRevenue ? formatCurrency(revenueTotal) : "N/A",
+      detail: hasRevenue ? "Total visible revenue" : "No revenue field returned",
+    },
+    {
+      label: "Top Result",
+      value: String(topLabel),
+      detail: result.chart?.y ? `Ranked by ${formatLabel(result.chart.y)}` : "First row",
+    },
+  ];
+}
+
+function getSentinelKpis(result, chartData) {
+  if (!result?.series?.length) {
+    return [
+      { label: "Points", value: formatNumber(chartData.length), detail: "Ready to scan" },
+      { label: "Anomalies", value: "0", detail: "No scan run yet" },
+      { label: "Max Score", value: "Pending", detail: "Run detection" },
+    ];
+  }
+
+  const maxScore = Math.max(...result.series.map((point) => Number(point.anomaly_score)));
+  return [
+    {
+      label: "Points",
+      value: formatNumber(result.series.length),
+      detail: "Scored observations",
+    },
+    {
+      label: "Anomalies",
+      value: formatNumber(result.anomalies.length),
+      detail: result.anomalies.length ? "Needs review" : "Signal looks stable",
+    },
+    {
+      label: "Max Score",
+      value: maxScore.toFixed(4),
+      detail: "Higher means more unusual",
+    },
+  ];
+}
+
+function buildChartExplanation(result, chartData) {
+  if (!result?.chart || !chartData.length || result.chart.type === "table") {
+    return "The current result is best read as a table because no chartable fields were returned.";
+  }
+
+  const yKey = result.chart.y;
+  const xKey = result.chart.x;
+  const sorted = [...chartData].sort((a, b) => Number(b[yKey]) - Number(a[yKey]));
+  const top = sorted[0];
+  const bottom = sorted[sorted.length - 1];
+  const total = sorted.reduce((sum, row) => sum + Number(row[yKey] || 0), 0);
+  const topShare = total ? (Number(top[yKey]) / total) * 100 : 0;
+
+  return `${formatLabel(yKey)} is highest for ${top[xKey]} and lowest for ${bottom[xKey]}. The top category represents ${topShare.toFixed(1)}% of the visible total, so the chart is showing ${topShare > 50 ? "a concentrated pattern" : "a distributed pattern"} across ${chartData.length} result rows.`;
+}
+
+function sumNumericField(rows, field) {
+  return rows.reduce((sum, row) => {
+    const value = Number(row[field]);
+    return Number.isFinite(value) ? sum + value : sum;
+  }, 0);
+}
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat("en-US").format(value);
 }
 
 function getChartTitle(chart) {
