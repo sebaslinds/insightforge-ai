@@ -20,6 +20,8 @@ GEMINI_API_KEY=your-real-gemini-key
 CORS_ORIGINS=https://your-vercel-app.vercel.app
 ```
 
+`GEMINI_API_KEY` is required for BI Copilot. It is optional but recommended for Data Sentinel anomaly explanations; without it, Data Sentinel returns a deterministic fallback explanation.
+
 Render will create:
 
 - `insightforge-bi-copilot-api`

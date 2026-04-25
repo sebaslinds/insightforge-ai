@@ -6,6 +6,7 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -316,16 +317,32 @@ function DataSentinel() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const parsedSeries = useMemo(() => parseSeries(series), [series]);
-  const anomalySet = useMemo(() => new Set(result?.anomalies || []), [result]);
+  const parsedSeries = useMemo(() => parseSentinelInput(series), [series]);
   const chartData = useMemo(
-    () =>
-      parsedSeries.map((value, index) => ({
+    () => {
+      if (result?.series?.length) {
+        return result.series.map((point) => ({
+          index: point.index,
+          label: point.timestamp || String(point.index),
+          value: point.value,
+          anomaly: point.is_anomaly ? point.value : null,
+          anomaly_score: point.anomaly_score,
+          threshold: result.threshold,
+          status: point.is_anomaly ? "anomaly" : "normal",
+        }));
+      }
+
+      return parsedSeries.map((point, index) => ({
         index: index + 1,
-        value,
-        anomaly: anomalySet.has(value) ? value : null,
-      })),
-    [anomalySet, parsedSeries],
+        label: point.timestamp || String(index + 1),
+        value: getPointValue(point),
+        anomaly: null,
+        anomaly_score: null,
+        threshold: 0,
+        status: "pending",
+      }));
+    },
+    [parsedSeries, result],
   );
 
   async function detectAnomalies(event) {
@@ -371,7 +388,7 @@ function DataSentinel() {
       </header>
 
       <form className="sentinel-form" onSubmit={detectAnomalies}>
-        <label htmlFor="series-input">Numeric series</label>
+        <label htmlFor="series-input">Numeric series or timestamp,value rows</label>
         <textarea
           id="series-input"
           value={series}
@@ -398,9 +415,10 @@ function DataSentinel() {
               {result.anomalies.length
                 ? `${result.anomalies.length} anomalous value${
                     result.anomalies.length > 1 ? "s" : ""
-                  } detected: ${result.anomalies.join(", ")}.`
+                  } detected: ${result.anomalies.map(formatAnomalyLabel).join(", ")}.`
                 : "No anomalous values were detected."}
             </p>
+            <p>{result.explanation}</p>
           </section>
 
           <div className="visual-grid">
@@ -412,7 +430,7 @@ function DataSentinel() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 12, right: 12, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="index" />
+                    <XAxis dataKey="label" />
                     <YAxis />
                     <Tooltip />
                     <Line
@@ -436,17 +454,44 @@ function DataSentinel() {
 
             <section className="panel">
               <div className="panel-header">
-                <h2>Values</h2>
+                <h2>Anomaly Scores</h2>
               </div>
-              <DataTable
-                rows={chartData.map((row) => ({
-                  index: row.index,
-                  value: row.value,
-                  status: row.anomaly === null ? "normal" : "anomaly",
-                }))}
-              />
+              <div className="chart-wrap">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData} margin={{ top: 12, right: 12, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="label" />
+                    <YAxis />
+                    <Tooltip />
+                    <ReferenceLine y={result.threshold} stroke="#dc2626" strokeDasharray="4 4" />
+                    <Line
+                      type="monotone"
+                      dataKey="anomaly_score"
+                      stroke="#047857"
+                      strokeWidth={3}
+                      dot={{ r: 3 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </section>
           </div>
+
+          <section className="panel">
+            <div className="panel-header">
+              <h2>Scored Values</h2>
+            </div>
+            <DataTable
+              rows={chartData.map((row) => ({
+                index: row.index,
+                timestamp: row.label,
+                value: row.value,
+                anomaly_score:
+                  row.anomaly_score === null ? "pending" : Number(row.anomaly_score).toFixed(6),
+                status: row.status,
+              }))}
+            />
+          </section>
         </section>
       )}
     </section>
@@ -481,8 +526,36 @@ function ChartRenderer({ chart, data }) {
   );
 }
 
-function parseSeries(value) {
-  return value
+function formatAnomalyLabel(anomaly) {
+  const value = Number(anomaly.value).toString();
+  return anomaly.timestamp ? `${value} at ${anomaly.timestamp}` : value;
+}
+
+function getPointValue(point) {
+  return typeof point === "number" ? point : point.value;
+}
+
+function parseSentinelInput(value) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return [];
+  }
+
+  const lines = trimmed
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const timestampRows = lines
+    .map((line) => line.split(",").map((part) => part.trim()))
+    .filter((parts) => parts.length === 2 && !Number.isFinite(Number(parts[0])));
+
+  if (timestampRows.length === lines.length) {
+    return timestampRows
+      .map(([timestamp, rawValue]) => ({ timestamp, value: Number(rawValue) }))
+      .filter((point) => Number.isFinite(point.value));
+  }
+
+  return trimmed
     .split(/[\s,;]+/)
     .map((item) => item.trim())
     .filter(Boolean)
