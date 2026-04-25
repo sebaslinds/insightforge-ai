@@ -8,10 +8,12 @@ try:
     from config import get_settings
     from errors import AIServiceError, ConfigurationError
     from services.query_service import validate_read_only_sql
+    from services.schema_service import get_sales_schema_prompt
 except ModuleNotFoundError:
     from backend.config import get_settings
     from backend.errors import AIServiceError, ConfigurationError
     from backend.services.query_service import validate_read_only_sql
+    from backend.services.schema_service import get_sales_schema_prompt
 
 
 logger = logging.getLogger(__name__)
@@ -19,15 +21,24 @@ MAX_INSIGHT_ROWS = 50
 
 
 def _build_sql_prompt(question: str) -> str:
+    schema = get_sales_schema_prompt()
     return f"""
 You are a BI Copilot that converts business questions into SQL.
 Return only SQL, with no markdown fences or explanation.
 Generate read-only SQL only. Do not generate INSERT, UPDATE, DELETE, DROP, ALTER, or TRUNCATE statements.
-Use a simple sales analytics schema unless the user provides more context:
-- sales(id, product, category, price, quantity, date, customer_id)
+Use this exact SQLite schema:
+{schema}
 
-Revenue is calculated as price * quantity.
-When answering revenue questions, alias the calculated metric as revenue.
+SQL rules:
+- Use SQLite-compatible SQL.
+- Use only the sales table and the columns listed above.
+- For revenue, use SUM(price * quantity) and alias it as revenue when aggregating.
+- For product-level revenue, GROUP BY product.
+- For category-level revenue, GROUP BY category.
+- For time trends, group by date.
+- Use SUM, AVG, COUNT, MIN, MAX, GROUP BY, and ORDER BY when useful.
+- Add a sensible LIMIT for ranked lists unless the user asks for all rows.
+- Never include comments or multiple statements.
 Rows ingested by the ethical demo scraper use category = 'Scraped Demo'.
 When users ask for scraped demo products, filter with category = 'Scraped Demo', not product LIKE '%scraped demo%'.
 
@@ -39,11 +50,12 @@ def _build_insight_prompt(data: list[dict[str, Any]]) -> str:
     data_sample = data[:MAX_INSIGHT_ROWS]
     return f"""
 You are a senior BI analyst.
-Analyze the dataset and return concise, professional business insights.
-Focus on trends, anomalies, and useful next actions.
-Use 2-4 short sentences.
+Analyze the dataset and return concise, professional business insights as exactly three bullets:
+- Trend: summarize the main business pattern.
+- Anomaly: identify any unusual value or say none is evident.
+- Recommendation: suggest one practical next action.
+Keep each bullet to one sentence.
 Return plain text only.
-Do not use markdown, bullets, asterisks, headings, or numbered lists.
 Do not mention technical implementation details.
 
 Dataset sample:

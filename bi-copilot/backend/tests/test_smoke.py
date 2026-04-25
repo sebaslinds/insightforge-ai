@@ -26,6 +26,7 @@ def test_health() -> None:
 
 def test_ask_with_mocked_gemini(monkeypatch: pytest.MonkeyPatch) -> None:
     client = TestClient(main.app)
+    main.answer_cache.clear()
 
     monkeypatch.setattr(
         main,
@@ -96,8 +97,49 @@ def test_ai_sql_validation_blocks_unsafe_generated_sql() -> None:
         ai._validate_sql("SELECT * FROM sales; DROP TABLE sales;")
 
 
+def test_sql_prompt_includes_schema_and_aggregation_rules() -> None:
+    prompt = ai._build_sql_prompt("Revenue by category")
+
+    assert "Use this exact SQLite schema" in prompt
+    assert "sales" in prompt
+    assert "product" in prompt
+    assert "SUM(price * quantity)" in prompt
+    assert "GROUP BY category" in prompt
+
+
+def test_insight_prompt_requests_structured_bullets() -> None:
+    prompt = ai._build_insight_prompt([{"product": "Laptop Pro 14", "revenue": 7495.0}])
+
+    assert "- Trend:" in prompt
+    assert "- Anomaly:" in prompt
+    assert "- Recommendation:" in prompt
+
+
+def test_answer_question_caches_repeated_questions(monkeypatch: pytest.MonkeyPatch) -> None:
+    main.answer_cache.clear()
+    calls = {"sql": 0, "insight": 0}
+
+    def fake_generate_sql(question: str) -> str:
+        calls["sql"] += 1
+        return "SELECT product, price * quantity AS revenue FROM sales LIMIT 2;"
+
+    def fake_generate_insight(data: list[dict]) -> str:
+        calls["insight"] += 1
+        return "- Trend: Revenue is product-led.\n- Anomaly: None is evident.\n- Recommendation: Monitor premium items."
+
+    monkeypatch.setattr(main, "generate_sql", fake_generate_sql)
+    monkeypatch.setattr(main, "generate_insight", fake_generate_insight)
+
+    first = main.answer_question("Top products by revenue")
+    second = main.answer_question("  top PRODUCTS   by revenue ")
+
+    assert first == second
+    assert calls == {"sql": 1, "insight": 1}
+
+
 def test_app_errors_include_request_id(monkeypatch: pytest.MonkeyPatch) -> None:
     client = TestClient(main.app)
+    main.answer_cache.clear()
 
     monkeypatch.setattr(main, "generate_sql", lambda question: "DROP TABLE sales;")
 

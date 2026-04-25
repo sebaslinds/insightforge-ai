@@ -13,6 +13,7 @@ try:
     from errors import AppError
     from routes.ingestion import router as ingestion_router
     from schemas import AskRequest, AskResponse, HealthResponse
+    from services.cache_service import LRUCache
     from services.chart_service import suggest_chart
     from services.query_service import run_query
     from services.seed_service import seed_database
@@ -22,6 +23,7 @@ except ModuleNotFoundError:
     from backend.errors import AppError
     from backend.routes.ingestion import router as ingestion_router
     from backend.schemas import AskRequest, AskResponse, HealthResponse
+    from backend.services.cache_service import LRUCache
     from backend.services.chart_service import suggest_chart
     from backend.services.query_service import run_query
     from backend.services.seed_service import seed_database
@@ -29,6 +31,7 @@ except ModuleNotFoundError:
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 settings = get_settings()
+answer_cache: LRUCache[AskResponse] = LRUCache(max_size=64)
 
 
 @asynccontextmanager
@@ -124,16 +127,22 @@ async def request_logging_middleware(request: Request, call_next):
 
 def answer_question(question: str) -> AskResponse:
     """Generate SQL for the question and execute it against sample data."""
-    sql = generate_sql(question)
-    data = run_query(sql)
-    insight = generate_insight(data)
-    chart = suggest_chart(data)
-    return AskResponse(
-        sql=sql,
-        data=data,
-        insight=insight,
-        chart=chart,
-    )
+    cache_key = " ".join(question.lower().split())
+
+    def build_answer() -> AskResponse:
+        logger.info("answer_cache_miss question=%s", cache_key)
+        sql = generate_sql(question)
+        data = run_query(sql)
+        insight = generate_insight(data)
+        chart = suggest_chart(data)
+        return AskResponse(
+            sql=sql,
+            data=data,
+            insight=insight,
+            chart=chart,
+        )
+
+    return answer_cache.get_or_set(cache_key, build_answer)
 
 
 @app.get("/health", response_model=HealthResponse)
