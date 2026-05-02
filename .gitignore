@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Python
 __pycache__/
 .pytest_cache/
@@ -35,3 +36,45 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 .vscode/
+=======
+# Environnement
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.egg
+
+# ML models (trop lourds pour Git — à stocker sur S3 ou inclure dans Docker)
+# Décommente si tu veux les exclure :
+# backend/src/services/ml/models/*.pkl
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-error.log*
+
+# Data (CSV volumineux)
+data/*.csv
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+>>>>>>> f2b1140 (feat: InsightForge AI v1.3.0 - auth multi-tenant, alertes Slack/Email, Dockerfile deploiement)

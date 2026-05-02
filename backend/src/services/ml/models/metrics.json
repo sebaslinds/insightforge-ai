@@ -1,0 +1,12 @@
+{
+  "xgboost": {
+    "accuracy": 0.755,
+    "status": "trained",
+    "n_estimators": 200
+  },
+  "kmeans": {
+    "silhouette": 0.2537,
+    "status": "trained",
+    "n_clusters": 4
+  }
+}
