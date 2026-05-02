@@ -1,0 +1,462 @@
+"use client";
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+export type Language = 'en' | 'fr';
+
+export const THEME_COLORS: Record<string, { primary: string, secondary: string }> = {
+  midnight: { primary: '#007db8', secondary: '#051c2c' },
+  ocean: { primary: '#0ea5e9', secondary: '#2dd4bf' },
+  emerald: { primary: '#10b981', secondary: '#84cc16' },
+  corporate: { primary: '#3b82f6', secondary: '#64748b' },
+};
+
+interface LanguageContextType {
+  lang: Language;
+  setLang: (lang: Language) => void;
+  theme: string;
+  setTheme: (theme: string) => void;
+  t: (key: string) => string;
+}
+
+export const LanguageContext = createContext<LanguageContextType>({} as LanguageContextType);
+
+export const translations: Record<Language, Record<string, string>> = {
+  en: {
+    'nav.dashboard': 'Dashboard',
+    'nav.segments': 'Segments',
+    'nav.copilot': 'Copilot',
+    'nav.ml': 'ML Models',
+    'nav.decision': 'Decision Engine',
+    'nav.project': 'Project Info',
+    'nav.settings': 'Settings',
+    'nav.retention': 'Retention',
+    
+    'dash.overview': 'Overview',
+    'dash.subtitle': 'InsightForge AI Analytics Dashboard',
+    'dash.last30': 'Last 30 Days',
+    'dash.genReport': 'Generate Report',
+    'dash.export': 'Download CSV',
+    'dash.revenue': 'Total Revenue',
+    'dash.users': 'Active Users',
+    'dash.engagement': 'Engagement Score',
+    'dash.churn': 'Churn Risk',
+    'dash.vsLastMonth': 'vs last month',
+    'dash.revTrend': 'Revenue Trend',
+    'dash.userSeg': 'User Segmentation',
+    'granularity.year': 'Year',
+    'granularity.month': 'Month',
+    'granularity.week': 'Week',
+    'granularity.day': 'Day',
+    
+    'ml.title': 'ML Models',
+    'ml.subtitle': 'Manage XGBoost and K-Means models.',
+    'ml.churn': 'Churn Predictor (XGBoost)',
+    'ml.accuracy': 'Accuracy',
+    'ml.lastTrained': 'Last Trained',
+    'ml.status': 'Status',
+    'ml.active': 'Active',
+    'ml.retrain': 'Retrain Model',
+    'ml.seg': 'Segmentation (K-Means)',
+    'ml.clusters': 'Clusters',
+    'ml.silhouette': 'Silhouette Score',
+    'ml.update': 'Update Clusters',
+    'ml.driftTitle': 'Model Drift Monitoring',
+    'ml.driftDate': 'Date',
+    'ml.driftMetric': 'Metric',
+    'ml.driftValue': 'Baseline vs Current',
+    'ml.driftStatus': 'Drift Status',
+    'ml.driftStable': 'Stable',
+    'ml.driftWarning': 'Drift Detected',
+    
+    'dec.title': 'Decision Engine config',
+    'dec.subtitle': 'Configure rules and automation triggers.',
+    'dec.activeRules': 'Active Rules',
+    'dec.highAnomaly': 'High Anomaly Alert',
+    'dec.highAnomalyDesc': 'Triggers Slack alert when anomaly confidence > 0.8',
+    'dec.lowRev': 'Low Revenue Recommendation',
+    'dec.lowRevDesc': 'Logs a recommendation if daily revenue drops below $1000',
+    'dec.enabled': 'Enabled',
+    'dec.addRule': 'Add New Rule',
+    'dec.noRules': 'No rules yet. Use AI to suggest some!',
+    
+    'copilot.title': 'AI Copilot Fullscreen',
+    'copilot.subtitle': 'Chat directly with the Decision Engine.',
+    'copilot.header': 'Decision Copilot',
+    'copilot.you': 'You',
+    'copilot.ai': 'InsightForge AI',
+    'copilot.decisions': 'Engine Decisions',
+    'copilot.actions': 'Automated Actions',
+    'copilot.suggested': 'Suggested follow-ups:',
+    'copilot.reasoning': 'Engine reasoning...',
+    'copilot.placeholder': 'Type your command or question...',
+    
+    'seg.title': 'User Segments',
+    'seg.subtitle': 'Detailed view of your user clusters.',
+    'seg.explorer': 'Segment Explorer',
+    'seg.explorerDesc': 'Select a segment to view detailed user lists and ML insights.',
+    'seg.load': 'Load Segment Data',
+    
+    'set.title': 'Settings',
+    'set.subtitle': 'Manage application preferences.',
+    'set.config': 'Configuration',
+    'set.configDesc': 'API Keys, integrations and general settings go here.',
+    
+    'project.title': 'About InsightForge',
+    'project.subtitle': 'High-performance AI personalization engine.',
+    'project.vision': 'The Mission',
+    'project.visionDesc': 'InsightForge is a multi-tenant B2B SaaS platform that acts as a plug-and-play AI personalization engine for other SaaS companies. Instead of building their own ML models, SaaS businesses connect InsightForge to their database. We transform their raw behavioral data into automated, high-converting customer experiences. By predicting churn risk and segmenting users in real-time, we enable Product teams to trigger the right message at the right time.',
+    'project.modulesTitle': 'Core Pipeline Architecture',
+    'project.module1': 'Data Ingestion',
+    'project.module1Desc': 'Real-time API endpoints ingesting simulated user sessions, feature usage, and subscription events.',
+    'project.module2': 'Feature Engine',
+    'project.module2Desc': 'Transforms raw event streams into structured ML features (Breadth, Recency, Frequency).',
+    'project.module3': 'Churn Predictor',
+    'project.module3Desc': 'XGBoost model predicting the probability of user departure (Churn Score).',
+    'project.module4': 'Segmentation',
+    'project.module4Desc': 'K-Means clustering categorizing users into 4 distinct behavioral profiles.',
+    'project.module5': 'Decision Engine',
+    'project.module5Desc': 'Rule-based automation engine triggering alerts and webhook actions based on ML anomalies.',
+    'project.module6': 'AI Copilot',
+    'project.module6Desc': 'Generative AI assistant (GPT-4o) allowing executives to chat directly with their SaaS data.',
+    'project.tech': 'Technology Stack',
+    'project.techList': 'FastAPI & Python (AI Backend), Next.js 14 (Premium UI), PostgreSQL (Events), OpenAI GPT-4o (Reasoning).',
+    'project.dataSource': 'Data Strategy',
+    'project.originDesc': 'Synthetic data generated to simulate a global SaaS environment with realistic behavioral patterns.',
+    'project.lexicon': 'Glossary of Terms',
+    'project.lex.churn': 'Churn Rate',
+    'project.lex.churnDesc': 'Percentage of users who stop using the service over a period.',
+    'project.lex.engagement': 'Engagement Score',
+    'project.lex.engagementDesc': 'Composite score (0-100) based on session frequency and feature usage.',
+    'project.lex.xgboost': 'XGBoost',
+    'project.lex.xgboostDesc': 'Advanced algorithm used here to predict the probability of a user churning.',
+    'project.lex.kmeans': 'K-Means',
+    'project.lex.kmeansDesc': 'Unsupervised learning model used to group users into 4 distinct profiles.',
+    'project.lex.drift': 'Model Drift',
+    'project.lex.driftDesc': 'Degradation of predictive performance due to changes in user behavior over time.',
+    'project.lex.breadth': 'Feature Breadth',
+    'project.lex.breadthDesc': 'Number of unique features used by a user (indicates product adoption depth).',
+    
+    'project.infraTitle': 'Infrastructure & Deployments',
+    'project.cloudRunDesc': 'Auto-scaling serverless containers hosting the Next.js frontend and FastAPI Python backend.',
+    'project.dbDesc': 'Managed PostgreSQL instance storing user events, scores, and segments.',
+    'project.dataSeedTitle': 'Live Seeded Data',
+    'project.dataSeedDesc': '6,000+ simulated users generated via seed_cloud.py with realistic ML parameters.',
+
+    'login.title': 'Welcome Back',
+    'login.subtitle': 'Sign in to access InsightForge Dashboard',
+    'login.email': 'Email Address',
+    'login.password': 'Password',
+    'login.button': 'Sign In',
+    'login.error': 'Invalid credentials',
+    'login.demo': 'Demo access: admin@acme.com / admin123',
+    
+    'ml.churnPred': 'Churn Probability per User',
+    
+    'dec.suggestAI': 'Suggest with AI',
+    'dash.reportGenerated': 'Report Generated',
+    'dash.close': 'Close',
+    'dash.cancel': 'Cancel',
+    'dash.confirm': 'Confirm',
+    'dec.delete': 'Delete',
+    'nav.signOut': 'Sign Out',
+    'nav.langLabel': 'Language',
+    'notif.new': 'New',
+    'notif.title': 'Notifications',
+    'notif.empty': 'No notifications yet',
+    'seg.avgScoreTitle': 'Engagement Score',
+    'seg.avgScoreDesc': 'Composite score (0-100) based on activity, feature breadth, and session duration.',
+    'seg.inactivityTitle': 'Average Inactivity',
+    'seg.inactivityDesc': 'Average number of days since the last recorded user session.',
+    'dash.revenueDesc': 'Total cumulative revenue based on active plans: Pro ($49) and Enterprise ($499).',
+    'dash.usersDesc': 'Number of users who joined or were active during the selected period.',
+    'dash.engagementDesc': 'Average engagement score of users in this period (0-100).',
+    'dash.churnDesc': 'Percentage of users at high risk of churn or already churned in this period.',
+    'seg.desc.power_user': 'High usage intensity, uses all features.',
+    'seg.desc.casual': 'Moderate usage, basic features only.',
+    'seg.desc.at_risk': 'Recent drop in engagement.',
+    'seg.desc.dormant': 'Inactive for 14+ days.',
+    'seg.recommendation': 'Recommended Action',
+    'dash.cardDetail': 'Click to see details. Based on {title} pricing for {period}.',
+    'dash.realTime': 'Real-time sync',
+    'dash.detailContext': 'Detail & Context',
+    'set.profile': 'User Profile',
+    'set.admin': 'Administrator (Acme Corp)',
+    'set.edit': 'Edit Profile',
+    'set.theme': 'Visual Theme',
+    'set.themeDesc': 'Change the primary color palette of the dashboard.',
+    'theme.midnight': 'Midnight Blue',
+    'theme.ocean': 'Deep Ocean',
+    'theme.emerald': 'Forest Emerald',
+    'theme.corporate': 'Modern Corporate',
+    'set.delete': 'Delete Account',
+    'dec.testAlert': 'Test Alerting',
+    'dec.campaignSent': 'Campaign Sent',
+    'dec.triggerCampaign': 'Trigger Campaign',
+    'dec.deleteTitle': 'Delete Rule',
+    'dec.deleteMsg': 'Are you sure you want to delete this decision rule? This action cannot be undone.',
+    'dec.deleteConfirm': 'Delete',
+    'notif.clearTitle': 'Clear Notifications',
+    'notif.clearMsg': 'Are you sure you want to clear all notifications? This action cannot be undone.',
+    'notif.clearConfirm': 'Clear All',
+    'seg.suggested': 'Suggested',
+    
+    'ret.title': 'User Retention',
+    'ret.subtitle': 'Cohort analysis based on signup week.',
+    'ret.size': 'Cohort Size',
+    'ret.week': 'Week',
+    'ret.empty': 'Not enough data for cohort analysis yet.',
+    'ml.accuracyDesc': 'Measures the model\'s ability to correctly predict churn by comparing its forecasts with historical data.',
+    'ret.avgDesc': 'Percentage of users who return to the application after their first week of usage (W1 Retention).',
+    'ret.howTo': 'How to read this?',
+    'ret.howToDesc': 'Each row represents a cohort of users who signed up in the same week. Each column shows the percentage of those users who returned to the platform after X weeks. Darker colors indicate higher retention.',
+    'ret.avgW1': 'Avg. Week 1 Retention',
+    'ret.bestCohort': 'Best Performing Cohort',
+    'ret.insights': 'Actionable Insights',
+    'ret.insight1': 'Cohorts with < 60% W1 retention need immediate onboarding improvements.',
+    'ret.insight2': 'A drop in Week 3 often indicates a value gap after the trial period.',
+  },
+  fr: {
+    'nav.dashboard': 'Tableau de bord',
+    'nav.segments': 'Segments',
+    'nav.copilot': 'Copilote',
+    'nav.ml': 'Modèles ML',
+    'nav.decision': 'Moteur de décision',
+    'nav.project': 'Infos Projet',
+    'nav.settings': 'Paramètres',
+    'nav.retention': 'Rétention',
+    
+    'dash.overview': 'Vue d\'ensemble',
+    'dash.subtitle': 'Tableau de bord analytique InsightForge AI',
+    'dash.last30': '30 derniers jours',
+    'dash.genReport': 'Générer le rapport',
+    'dash.export': 'Exporter CSV',
+    'dash.revenue': 'Revenus totaux',
+    'dash.users': 'Utilisateurs actifs',
+    'dash.engagement': 'Score d\'engagement',
+    'dash.churn': 'Risque d\'attrition',
+    'dash.vsLastMonth': 'vs mois dernier',
+    'dash.revTrend': 'Tendance des revenus',
+    'dash.userSeg': 'Segmentation',
+    'granularity.year': 'Année',
+    'granularity.month': 'Mois',
+    'granularity.week': 'Semaine',
+    'granularity.day': 'Jour',
+    
+    'ml.title': 'Modèles d\'apprentissage',
+    'ml.subtitle': 'Gérer les modèles XGBoost et K-Means.',
+    'ml.churn': 'Prédiction d\'attrition',
+    'ml.accuracy': 'Précision',
+    'ml.lastTrained': 'Dernier entraînement',
+    'ml.status': 'Statut',
+    'ml.active': 'Actif',
+    'ml.retrain': 'Réentraîner le modèle',
+    'ml.seg': 'Segmentation',
+    'ml.clusters': 'Clusters',
+    'ml.silhouette': 'Score de Silhouette',
+    'ml.update': 'Mettre à jour',
+    'ml.driftTitle': 'Monitoring de la Dérive (Drift)',
+    'ml.driftDate': 'Date',
+    'ml.driftMetric': 'Métrique',
+    'ml.driftValue': 'Référence vs Actuel',
+    'ml.driftStatus': 'Statut Dérive',
+    'ml.driftStable': 'Stable',
+    'ml.driftWarning': 'Dérive Détectée',
+    
+    'ml.churnPred': 'Probabilité de Churn par Utilisateur',
+    
+    'dec.title': 'Configuration Moteur Décision',
+    'dec.subtitle': 'Configurer les règles et déclencheurs.',
+    'dec.activeRules': 'Règles actives',
+    'dec.highAnomaly': 'Alerte d\'anomalie élevée',
+    'dec.highAnomalyDesc': 'Envoie une alerte Slack si confiance > 0.8',
+    'dec.lowRev': 'Alerte revenus faibles',
+    'dec.lowRevDesc': 'Journalise une recommandation si revenus < 1000$',
+    'dec.enabled': 'Activé',
+    'dec.addRule': 'Ajouter une règle',
+    'dec.noRules': 'Aucune règle configurée. Utilisez l\'IA pour en suggérer !',
+    
+    'copilot.title': 'Copilote IA',
+    'copilot.subtitle': 'Discutez directement avec le moteur de décision.',
+    'copilot.header': 'Copilote de décision',
+    'copilot.you': 'Vous',
+    'copilot.ai': 'IA InsightForge',
+    'copilot.decisions': 'Décisions du moteur',
+    'copilot.actions': 'Actions automatisées',
+    'copilot.suggested': 'Suivis suggérés:',
+    'copilot.reasoning': 'Raisonnement...',
+    'copilot.placeholder': 'Tapez votre commande ou question...',
+    
+    'seg.title': 'Segments Utilisateurs',
+    'seg.subtitle': 'Vue détaillée de vos clusters utilisateurs.',
+    'seg.explorer': 'Explorateur de segments',
+    'seg.explorerDesc': 'Sélectionnez un segment pour voir les détails.',
+    'seg.load': 'Charger les données',
+    
+    'set.title': 'Paramètres',
+    'set.subtitle': 'Gérer les préférences de l\'application.',
+    'set.config': 'Configuration',
+    'set.configDesc': 'Clés API, intégrations et paramètres.',
+    
+    'project.title': 'À propos d\'InsightForge',
+    'project.subtitle': 'Moteur de personnalisation IA haute performance.',
+    'project.vision': 'La Mission',
+    'project.visionDesc': 'InsightForge est une plateforme SaaS B2B "clé en main" qui dote les autres entreprises SaaS d\'un moteur de personnalisation IA multi-tenant. Au lieu de développer leurs propres modèles ML complexes, les entreprises connectent InsightForge à leur base de données. Nous transformons les données comportementales brutes en expériences clients automatisées. En prédisant le churn et en segmentant les utilisateurs en temps réel, nous déclenchons le bon message au bon moment.',
+    'project.modulesTitle': 'Architecture du Pipeline',
+    'project.module1': 'Ingestion de Données',
+    'project.module1Desc': 'API en temps réel ingérant des flux simulés de sessions utilisateurs et d\'événements.',
+    'project.module2': 'Feature Engine',
+    'project.module2Desc': 'Transforme les événements en variables ML structurées (Breadth, Récence, Fréquence).',
+    'project.module3': 'Prédiction Churn',
+    'project.module3Desc': 'Modèle XGBoost calculant la probabilité de départ (Churn Score).',
+    'project.module4': 'Segmentation',
+    'project.module4Desc': 'Clustering K-Means classant les utilisateurs en 4 profils comportementaux.',
+    'project.module5': 'Moteur de Décision',
+    'project.module5Desc': 'Moteur d\'automatisation déclenchant des alertes basées sur les anomalies ML.',
+    'project.module6': 'Copilote IA',
+    'project.module6Desc': 'Assistant génératif (GPT-4o) permettant de discuter directement avec les données via SQL dynamique.',
+    'project.tech': 'Stack Technologique',
+    'project.techList': 'FastAPI & Python (IA Backend), Next.js 14 (Premium UI), PostgreSQL (Events), OpenAI GPT-4o (Raisonnement).',
+    'project.dataSource': 'Stratégie de Données',
+    'project.originDesc': 'Données synthétiques générées pour simuler un environnement SaaS global avec des motifs comportementaux réalistes.',
+    'project.lexicon': 'Lexique des Termes',
+    'project.lex.churn': 'Taux de Churn',
+    'project.lex.churnDesc': 'Pourcentage d\'utilisateurs qui arrêtent d\'utiliser le service sur une période donnée.',
+    'project.lex.engagement': 'Score d\'Engagement',
+    'project.lex.engagementDesc': 'Note composite (0-100) basée sur la fréquence des sessions et l\'utilisation des fonctionnalités.',
+    'project.lex.xgboost': 'XGBoost',
+    'project.lex.xgboostDesc': 'Algorithme avancé utilisé ici pour prédire la probabilité qu\'un utilisateur parte.',
+    'project.lex.kmeans': 'K-Means',
+    'project.lex.kmeansDesc': 'Modèle d\'apprentissage non supervisé utilisé pour regrouper les utilisateurs en 4 profils distincts.',
+    'project.lex.drift': 'Dérive (Drift)',
+    'project.lex.driftDesc': 'Dégradation de la performance prédictive due aux changements de comportement des utilisateurs au fil du temps.',
+    'project.lex.breadth': 'Feature Breadth',
+    'project.lex.breadthDesc': 'Nombre de fonctionnalités uniques utilisées par un utilisateur (indique la profondeur d\'adoption).',
+    
+    'project.infraTitle': 'Infrastructure & Déploiements',
+    'project.cloudRunDesc': 'Conteneurs serverless à auto-scaling hébergeant le frontend Next.js et le backend FastAPI Python.',
+    'project.dbDesc': 'Instance PostgreSQL managée stockant les événements utilisateurs, scores et segments.',
+    'project.dataSeedTitle': 'Données Live',
+    'project.dataSeedDesc': '+6000 utilisateurs simulés générés via seed_cloud.py avec des paramètres ML réalistes.',
+
+    'login.title': 'Bon retour',
+    'login.subtitle': 'Connectez-vous pour accéder au dashboard',
+    'login.email': 'Adresse Email',
+    'login.password': 'Mot de passe',
+    'login.button': 'Se connecter',
+    'login.error': 'Identifiants invalides',
+    'login.demo': 'Accès démo : admin@acme.com / admin123',
+    
+    'dec.suggestAI': 'Suggérer avec l\'IA',
+    'dash.reportGenerated': 'Rapport Généré',
+    'dash.close': 'Fermer',
+    'dash.cancel': 'Annuler',
+    'dash.confirm': 'Confirmer',
+    'dec.delete': 'Supprimer',
+    'nav.signOut': 'Déconnexion',
+    'nav.langLabel': 'Langue',
+    'notif.new': 'Nouveau',
+    'notif.title': 'Notifications',
+    'notif.empty': 'Aucune notification pour le moment',
+    'seg.avgScoreTitle': 'Score d\'Engagement',
+    'seg.avgScoreDesc': 'Score composite (0-100) basé sur l\'activité, la diversité des fonctions et la durée des sessions.',
+    'seg.inactivityTitle': 'Inactivité Moyenne',
+    'seg.inactivityDesc': 'Nombre moyen de jours écoulés depuis la dernière session active de l\'utilisateur.',
+    'dash.revenueDesc': 'Revenu total basé sur les abonnements : Pro (49$) et Enterprise (499$).',
+    'dash.usersDesc': 'Nombre d\'utilisateurs ayant rejoint ou ayant été actifs durant la période sélectionnée.',
+    'dash.engagementDesc': 'Score d\'engagement moyen des utilisateurs sur cette période (0-100).',
+    'dash.churnDesc': 'Pourcentage d\'utilisateurs à haut risque de désabonnement ou ayant déjà quitté sur cette période.',
+    'seg.desc.power_user': 'Usage intense, toutes les features.',
+    'seg.desc.casual': 'Usage modéré, features de base.',
+    'seg.desc.at_risk': 'Baisse engagement récente.',
+    'seg.desc.dormant': 'Inactif depuis 14j+.',
+    'seg.recommendation': 'Action Recommandée',
+    'dash.cardDetail': 'Cliquez pour voir le détail. Basé sur les tarifs {title} ({period}).',
+    'dash.realTime': 'Synchro temps réel',
+    'dash.detailContext': 'Détail & Contexte',
+    'set.profile': 'Profil Utilisateur',
+    'set.admin': 'Administrateur (Acme Corp)',
+    'set.edit': 'Modifier le profil',
+    'set.theme': 'Thème Visuel',
+    'set.themeDesc': 'Changer la palette de couleurs principale du dashboard.',
+    'theme.midnight': 'Bleu Minuit',
+    'theme.ocean': 'Océan Profond',
+    'theme.emerald': 'Émeraude Boréal',
+    'theme.corporate': 'Professionnel Moderne',
+    'set.delete': 'Supprimer le compte',
+    'dec.testAlert': 'Tester les alertes',
+    'dec.campaignSent': 'Campagne envoyée',
+    'dec.triggerCampaign': 'Lancer la campagne',
+    'dec.deleteTitle': 'Supprimer la règle',
+    'dec.deleteMsg': 'Êtes-vous sûr de vouloir supprimer cette règle de décision ? Cette action est irréversible.',
+    'dec.deleteConfirm': 'Supprimer',
+    'notif.clearTitle': 'Effacer les notifications',
+    'notif.clearMsg': 'Êtes-vous sûr de vouloir effacer toutes les notifications ? Cette action est irréversible.',
+    'notif.clearConfirm': 'Tout effacer',
+    'seg.suggested': 'Suggéré',
+
+    'ret.title': 'Rétention Utilisateur',
+    'ret.subtitle': 'Analyse de cohortes par semaine d\'inscription.',
+    'ret.size': 'Taille Cohorte',
+    'ret.week': 'Semaine',
+    'ret.empty': 'Pas assez de données pour l\'analyse de cohortes.',
+    'ml.accuracyDesc': 'Mesure la capacité du modèle à prédire correctement le churn en comparant ses prévisions aux données historiques.',
+    'ret.avgDesc': 'Pourcentage d\'utilisateurs qui reviennent sur l\'application après leur première semaine d\'utilisation (Rétention W1).',
+    'ret.howTo': 'Comment lire ce tableau ?',
+    'ret.howToDesc': 'Chaque ligne représente une cohorte d\'utilisateurs inscrits la même semaine. Chaque colonne montre le pourcentage d\'utilisateurs qui sont revenus après X semaines. Les couleurs plus foncées indiquent une meilleure rétention.',
+    'ret.avgW1': 'Rétention W1 Moyenne',
+    'ret.bestCohort': 'Meilleure Cohorte',
+    'ret.insights': 'Analyses Actionnables',
+    'ret.insight1': 'Les cohortes avec une rétention W1 < 60% nécessitent une amélioration de l\'onboarding.',
+    'ret.insight2': 'Une baisse en Semaine 3 indique souvent un manque de valeur perçue après l\'essai.',
+  }
+};
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [lang, setLang] = useState<Language>('en');
+  const [theme, setTheme] = useState<string>('midnight');
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('if_theme');
+    const savedLang = localStorage.getItem('if_lang') as Language;
+    
+    // Migrate old themes or default to midnight
+    if (!savedTheme || savedTheme === 'cyberpunk' || savedTheme === 'mckinsey') {
+      setTheme('midnight');
+      localStorage.setItem('if_theme', 'midnight');
+    } else {
+      setTheme(savedTheme);
+    }
+    
+    if (savedLang) setLang(savedLang);
+    setIsLoaded(true);
+  }, []);
+
+  const handleSetTheme = (newTheme: string) => {
+    setTheme(newTheme);
+    localStorage.setItem('if_theme', newTheme);
+  };
+
+  const handleSetLang = (newLang: Language) => {
+    setLang(newLang);
+    localStorage.setItem('if_lang', newLang);
+  };
+
+  const t = (key: string) => {
+    return translations[lang][key] || key;
+  };
+
+  // Prevent flash of unstyled content/wrong theme
+  if (!isLoaded) return <div className="min-h-screen bg-[#0f1115]" />;
+
+  return (
+    <LanguageContext.Provider value={{ lang, setLang: handleSetLang, theme, setTheme: handleSetTheme, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  return useContext(LanguageContext);
+}

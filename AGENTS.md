@@ -6,15 +6,32 @@
 
 \- SDK      : TypeScript leger, capture events utilisateur
 
-\- Frontend : Next.js 14, TypeScript, Tailwind CSS -> Vercel
+\- Frontend : Next.js 14, TypeScript, Tailwind CSS -> Google Cloud Run (GCP)
 
-\- Backend  : FastAPI Python 3.11 -> Render
+\- Backend  : FastAPI Python 3.11 -> Google Cloud Run (GCP)
 
 \- IA       : OpenAI GPT-4o pour messages personnalises
 
 \- ML       : XGBoost churn, K-Means segments, collaborative filtering
 
 \- DB       : PostgreSQL events + scores + segments
++
++
++
++## Infrastructure GCP (Production)
++
++- Cloud Run        : Hebergement containerisé (Auto-scaling)
++
++- Cloud SQL        : Instance PostgreSQL managée
++
++- Cloud Storage    : Stockage des assets et modèles ML
++
++- Artifact Registry : Dépôt d'images Docker
++
++- Cloud Build      : Pipeline CI/CD pour builds automatiques
++
++
++
 
 
 
