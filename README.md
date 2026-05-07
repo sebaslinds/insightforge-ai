@@ -1,5 +1,8 @@
 # 🚀 InsightForge AI
 
+**[🔗 Access Live Application (Demo)](https://frontend-gqaawjux7q-nn.a.run.app)**
+*(Use credentials: admin@acme.com / admin123)*
+
 **InsightForge AI** is a multi-tenant B2B SaaS platform that acts as a plug-and-play AI personalization engine for other SaaS companies. It transforms raw behavioral data into actionable insights, predicting churn and segmenting users in real-time, enabling Product and Customer Success teams to trigger the right messages at the right time.
 
 ## 🌟 Core Modules
