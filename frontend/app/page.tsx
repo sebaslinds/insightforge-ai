@@ -1264,6 +1264,8 @@ function SettingsView() {
     { id: 'ocean', color: 'bg-[#0ea5e9]' },
     { id: 'emerald', color: 'bg-[#10b981]' },
     { id: 'corporate', color: 'bg-[#3b82f6]' },
+    { id: 'academic', color: 'bg-[#7f1d1d]' },
+    { id: 'corporatelight', color: 'bg-[#2563eb]' },
   ];
 
   return (

@@ -41,6 +41,30 @@
   --secondary-rgb: 100, 116, 139;
 }
 
+.theme-academic {
+  --background: #faf9f6;
+  --foreground: #1c1917;
+  --primary: #7f1d1d;
+  --primary-rgb: 127, 29, 29;
+  --secondary: #1e3a8a;
+  --secondary-rgb: 30, 58, 138;
+  --card: rgba(255, 255, 255, 0.7);
+  --card-border: rgba(0, 0, 0, 0.1);
+  --color-white: #1c1917;
+}
+
+.theme-corporatelight {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --primary: #2563eb;
+  --primary-rgb: 37, 99, 235;
+  --secondary: #475569;
+  --secondary-rgb: 71, 85, 105;
+  --card: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(0, 0, 0, 0.1);
+  --color-white: #0f172a;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -225,6 +249,11 @@ body {
   background: rgba(30, 41, 59, 0.8);
   transform: translateY(-2px);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-academic .glass-panel:hover,
+.theme-corporatelight .glass-panel:hover {
+  background: rgba(255, 255, 255, 0.95);
 }
 
 /* Scrollbar invisible mais active pour un look épuré */
