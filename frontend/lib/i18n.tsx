@@ -51,6 +51,8 @@ export const translations: Record<Language, Record<string, string>> = {
     
     'ml.title': 'ML Models',
     'ml.subtitle': 'Manage XGBoost and K-Means models.',
+    'ml.trainingTitle': 'How are these models trained?',
+    'ml.trainingDesc': 'The XGBoost model (Churn Prediction) is trained on historical event data, utilizing features like recency, frequency, and session duration to predict the likelihood of an active user canceling their subscription. The K-Means algorithm (Segmentation) clusters users into 4 distinct behavioral profiles. These models are dynamically retrained using the latest production data (PostgreSQL) to prevent model drift.',
     'ml.churn': 'Churn Predictor (XGBoost)',
     'ml.accuracy': 'Accuracy',
     'ml.lastTrained': 'Last Trained',
@@ -253,6 +255,8 @@ export const translations: Record<Language, Record<string, string>> = {
     
     'ml.title': 'Modèles d\'apprentissage',
     'ml.subtitle': 'Gérer les modèles XGBoost et K-Means.',
+    'ml.trainingTitle': 'Comment ces modèles sont-ils entraînés ?',
+    'ml.trainingDesc': 'Le modèle XGBoost (Prédiction d\'attrition) est entraîné sur l\'historique des événements (récence, fréquence, durée) pour prédire la probabilité qu\'un utilisateur annule son abonnement. L\'algorithme K-Means (Segmentation) regroupe les utilisateurs en 4 profils comportementaux distincts. Ces modèles sont réentraînés dynamiquement avec les dernières données de production (PostgreSQL) pour éviter la dégradation des performances (Model Drift).',
     'ml.churn': 'Prédiction d\'attrition',
     'ml.accuracy': 'Précision',
     'ml.lastTrained': 'Dernier entraînement',

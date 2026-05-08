@@ -585,6 +585,15 @@ function MLView() {
         </button>
       </div>
 
+      <div className="glass-panel p-6 bg-slate-800/50 border border-white/5 mb-6">
+        <h3 className="font-bold text-white mb-2 flex items-center gap-2">
+          <Brain size={18} className="text-primary" /> {t('ml.trainingTitle')}
+        </h3>
+        <p className="text-sm text-foreground/80 leading-relaxed">
+          {t('ml.trainingDesc')}
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="glass-panel p-6">
           <p className="text-sm font-medium text-foreground/60 mb-1">XGBoost Accuracy</p>
