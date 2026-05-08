@@ -405,6 +405,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'theme.ocean': 'Océan Profond',
     'theme.emerald': 'Émeraude Boréal',
     'theme.corporate': 'Professionnel Moderne',
+    'theme.academic': 'Académique Clair',
+    'theme.corporate-light': 'Corporatif Clair',
     'set.delete': 'Supprimer le compte',
     'dec.testAlert': 'Tester les alertes',
     'dec.campaignSent': 'Campagne envoyée',
