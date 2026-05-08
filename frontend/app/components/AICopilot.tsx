@@ -24,8 +24,8 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-background/95 backdrop-blur-md border border-card-border p-3 rounded-xl shadow-2xl">
-          <p className="text-foreground font-bold mb-1 border-b border-foreground/10 pb-1">{label}</p>
+        <div className={`theme-${theme} bg-background/95 backdrop-blur-md border border-card-border p-3 rounded-xl shadow-2xl z-50`}>
+          <p className="text-foreground font-black mb-1 border-b border-foreground/20 pb-1">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-primary text-sm font-bold flex justify-between gap-4">
               <span className="opacity-70">{entry.name}:</span>
