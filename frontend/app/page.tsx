@@ -598,14 +598,15 @@ function MLView() {
         <div className="glass-panel p-6">
           <p className="text-sm font-medium text-foreground/60 mb-1">XGBoost Accuracy</p>
           <h3 className="text-2xl font-bold text-foreground">{((metrics?.xgboost?.accuracy || 0) * 100).toFixed(1)}%</h3>
-          <div className="w-full bg-white/5 h-2 rounded-full mt-4 overflow-hidden">
+          <p className="text-[10px] text-foreground/40 mt-1 leading-tight">{t('ml.accuracyDesc')}</p>
+          <div className="w-full bg-white/5 h-2 rounded-full mt-3 overflow-hidden">
             <div className="bg-success h-full transition-all" style={{ width: `${((metrics?.xgboost?.accuracy || 0) * 100)}%` }} />
           </div>
         </div>
         <div className="glass-panel p-6">
           <p className="text-sm font-medium text-foreground/60 mb-1">K-Means Silhouette</p>
           <h3 className="text-2xl font-bold text-foreground">{(metrics?.kmeans?.silhouette || 0).toFixed(3)}</h3>
-          <p className="text-xs text-foreground/40 mt-2">Clustering Quality Score</p>
+          <p className="text-[10px] text-foreground/40 mt-1 leading-tight">{t('ml.silhouetteDesc')}</p>
         </div>
         <div className="glass-panel p-6">
           <p className="text-sm font-medium text-foreground/60 mb-1">Last Trained</p>
@@ -616,7 +617,10 @@ function MLView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="glass-panel p-6">
-          <h3 className="font-semibold mb-6">{t('ml.churnPred')}</h3>
+          <div className="mb-6">
+            <h3 className="font-semibold">{t('ml.churnPred')}</h3>
+            <p className="text-[10px] text-foreground/40 mt-1">{t('ml.churnPredDesc')}</p>
+          </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={churnScores.slice(0, 20)}>
@@ -650,7 +654,10 @@ function MLView() {
         </div>
 
         <div className="glass-panel p-6">
-          <h3 className="font-semibold mb-6">{t('ml.featureImportance')}</h3>
+          <div className="mb-6">
+            <h3 className="font-semibold">{t('ml.featureImportance')}</h3>
+            <p className="text-[10px] text-foreground/40 mt-1">{t('ml.featureImportanceDesc')}</p>
+          </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart 

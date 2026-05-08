@@ -2,9 +2,9 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: [
     'build', 
-    '-t', 'northamerica-northeast1-docker.pkg.dev/insightforge-ai/insightforge-repo/frontend', 
+    '-t', '${_TAG}', 
     '--build-arg', 'NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}', 
     '.'
   ]
 images:
-- 'northamerica-northeast1-docker.pkg.dev/insightforge-ai/insightforge-repo/frontend'
+- '${_TAG}'
