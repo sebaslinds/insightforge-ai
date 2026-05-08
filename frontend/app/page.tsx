@@ -238,7 +238,7 @@ function DashboardView() {
                         <div className="absolute top-full left-0 mt-2 w-48 p-2 bg-black/95 text-[10px] text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 normal-case font-normal border border-white/10 backdrop-blur-xl shadow-xl">
                           {t('ml.accuracyDesc')}
                         </div>
-                        <h4 className="text-2xl font-bold text-white text-glow">75.5%</h4>
+                        <h4 className="text-2xl font-bold text-foreground text-glow">75.5%</h4>
                       </div>
                       <div className="p-2 bg-primary/20 rounded-lg text-primary"><Brain size={20}/></div>
                    </div>
@@ -262,7 +262,7 @@ function DashboardView() {
                         <div className="absolute top-full left-0 mt-2 w-48 p-2 bg-black/95 text-[10px] text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 normal-case font-normal border border-white/10 backdrop-blur-xl shadow-xl">
                           {t('ret.avgDesc')}
                         </div>
-                        <h4 className="text-2xl font-bold text-white text-glow">64.2%</h4>
+                        <h4 className="text-2xl font-bold text-foreground text-glow">64.2%</h4>
                       </div>
                       <div className="p-2 bg-success/20 rounded-lg text-success"><RefreshCw size={20}/></div>
                    </div>
@@ -302,7 +302,7 @@ function DashboardView() {
                     <button 
                       key={g} 
                       onClick={() => setGranularity(g)}
-                      className={`px-3 py-1 text-xs rounded-md capitalize transition-colors ${granularity === g ? 'bg-primary text-white shadow' : 'text-foreground/60 hover:text-white'}`}
+                      className={`px-3 py-1 text-xs rounded-md capitalize transition-colors ${granularity === g ? 'bg-primary text-primary-foreground shadow' : 'text-foreground/60 hover:text-foreground'}`}
                     >
                       {t(`granularity.${g}`)}
                     </button>
@@ -489,7 +489,7 @@ function SegmentsView() {
           <div key={seg?.name || idx} className="glass-panel p-6 border-l-4 flex flex-col justify-between" style={{ borderLeftColor: SEGMENT_COLORS[seg?.name] || colors.primary }}>
             <div>
               <p className="text-xs font-bold text-foreground/40 mb-1 uppercase tracking-wider">{(seg?.name || 'Unknown').replace('_', ' ')}</p>
-              <h3 className="text-3xl font-bold text-white mb-2">{seg?.count || 0}</h3>
+              <h3 className="text-3xl font-bold text-foreground mb-2">{seg?.count || 0}</h3>
               <p className="text-[11px] text-foreground/60 leading-relaxed min-h-[2.5rem]">
                 {t(`seg.desc.${seg?.name}`)}
               </p>
@@ -586,7 +586,7 @@ function MLView() {
       </div>
 
       <div className="glass-panel p-6 bg-slate-800/50 border border-white/5 mb-6">
-        <h3 className="font-bold text-white mb-2 flex items-center gap-2">
+        <h3 className="font-bold text-foreground mb-2 flex items-center gap-2">
           <Brain size={18} className="text-primary" /> {t('ml.trainingTitle')}
         </h3>
         <p className="text-sm text-foreground/80 leading-relaxed">
@@ -722,7 +722,7 @@ function RecommendationSection({ userId }: { userId: string }) {
       </div>
 
       <div className="bg-black/20 p-4 rounded-xl border border-white/5 relative z-10">
-        <p className="text-sm text-white italic leading-relaxed">
+        <p className="text-sm text-foreground italic leading-relaxed">
           "{rec.message}"
         </p>
         <div className="mt-4 flex items-center justify-between">
@@ -833,7 +833,7 @@ function DecisionEngineView() {
             {rules.map((rule) => (
               <div key={rule.id} className="p-6 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:border-primary/50 transition-all">
                 <div className="flex-1 pr-8">
-                  <h4 className="text-white font-bold mb-1 text-lg">{rule.name}</h4>
+                  <h4 className="text-foreground font-bold mb-1 text-lg">{rule.name}</h4>
                   <p className="text-foreground/60 text-sm leading-relaxed">{rule.description}</p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -876,7 +876,7 @@ function ProjectView() {
   return (
     <div className="max-w-5xl space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header>
-        <h1 className="text-4xl font-bold text-white mb-4">{t('project.title')}</h1>
+        <h1 className="text-4xl font-bold text-foreground mb-4">{t('project.title')}</h1>
         <p className="text-xl text-foreground/60">{t('project.subtitle')}</p>
       </header>
 
@@ -885,7 +885,7 @@ function ProjectView() {
         <h3 className="text-2xl font-bold text-primary mb-4 flex items-center gap-3">
           <Globe size={28}/> {t('project.vision')}
         </h3>
-        <p className="text-lg text-white/80 leading-relaxed max-w-4xl mb-8">
+        <p className="text-lg text-foreground/80 leading-relaxed max-w-4xl mb-8">
           {t('project.visionDesc')}
         </p>
         
@@ -911,7 +911,7 @@ function ProjectView() {
 
       {/* Architecture Section */}
       <section className="space-y-6">
-        <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+        <h3 className="text-2xl font-bold text-foreground flex items-center gap-3">
           <Network size={28} className="text-secondary"/> {t('project.modulesTitle')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -920,7 +920,7 @@ function ProjectView() {
               <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary font-bold mb-4 group-hover:scale-110 transition-transform">
                 0{num}
               </div>
-              <h4 className="text-lg font-bold text-white mb-2">{t(`project.module${num}`)}</h4>
+              <h4 className="text-lg font-bold text-foreground mb-2">{t(`project.module${num}`)}</h4>
               <p className="text-sm text-foreground/60 leading-relaxed">{t(`project.module${num}Desc`)}</p>
             </div>
           ))}
@@ -929,20 +929,20 @@ function ProjectView() {
 
       {/* Infrastructure Section */}
       <section className="space-y-6">
-        <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+        <h3 className="text-2xl font-bold text-foreground flex items-center gap-3">
           <Server size={28} className="text-success"/> {t('project.infraTitle')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="glass-panel p-6 border-t-2 border-t-[#4285F4]">
-             <h4 className="font-bold text-white mb-2 flex items-center gap-2"><Cloud size={18} className="text-[#4285F4]"/> Google Cloud Run</h4>
+             <h4 className="font-bold text-foreground mb-2 flex items-center gap-2"><Cloud size={18} className="text-[#4285F4]"/> Google Cloud Run</h4>
              <p className="text-sm text-foreground/60">{t('project.cloudRunDesc')}</p>
           </div>
           <div className="glass-panel p-6 border-t-2 border-t-[#336791]">
-             <h4 className="font-bold text-white mb-2 flex items-center gap-2"><Database size={18} className="text-[#336791]"/> Cloud SQL (PostgreSQL)</h4>
+             <h4 className="font-bold text-foreground mb-2 flex items-center gap-2"><Database size={18} className="text-[#336791]"/> Cloud SQL (PostgreSQL)</h4>
              <p className="text-sm text-foreground/60">{t('project.dbDesc')}</p>
           </div>
           <div className="glass-panel p-6 border-t-2 border-t-primary">
-             <h4 className="font-bold text-white mb-2 flex items-center gap-2"><DatabaseZap size={18} className="text-primary"/> {t('project.dataSeedTitle')}</h4>
+             <h4 className="font-bold text-foreground mb-2 flex items-center gap-2"><DatabaseZap size={18} className="text-primary"/> {t('project.dataSeedTitle')}</h4>
              <p className="text-sm text-foreground/60">{t('project.dataSeedDesc')}</p>
           </div>
         </div>
@@ -952,13 +952,13 @@ function ProjectView() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Tech Stack */}
         <section className="glass-panel p-6">
-          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
             <Settings size={20} className="text-foreground/40"/> {t('project.tech')}
           </h3>
           <p className="text-sm text-foreground/60 mb-6">{t('project.techList')}</p>
           <div className="flex flex-wrap gap-3">
             {['FastAPI', 'Python', 'XGBoost', 'K-Means', 'Next.js 14', 'PostgreSQL', 'OpenAI GPT-4o'].map(tech => (
-              <span key={tech} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-white/80">
+              <span key={tech} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-foreground/80">
                 {tech}
               </span>
             ))}
@@ -1098,7 +1098,7 @@ function RetentionView() {
                       <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${selectedCohorts.includes(c.cohort) ? 'bg-primary border-primary' : 'border-white/10 bg-white/5 group-hover:border-white/30'}`}>
                         {selectedCohorts.includes(c.cohort) && <Check size={10} className="text-white" />}
                       </div>
-                      <span className={`text-sm ${selectedCohorts.includes(c.cohort) ? 'text-white font-bold' : 'text-foreground/60'}`}>{c.cohort}</span>
+                      <span className={`text-sm ${selectedCohorts.includes(c.cohort) ? 'text-primary font-bold underline decoration-primary/30 underline-offset-4' : 'text-foreground/60'}`}>{c.cohort}</span>
                     </div>
                     <span className="text-[10px] font-mono text-foreground/30">{c.size} users</span>
                     <input 
@@ -1130,7 +1130,7 @@ function RetentionView() {
               <p className="text-[10px] uppercase font-bold text-foreground/40 mb-1 tracking-widest">{t('ret.avgW1')}</p>
               <Sparkles size={12} className="text-success opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <h3 className="text-3xl font-bold text-white">{avgW1.toFixed(1)}%</h3>
+            <h3 className="text-3xl font-bold text-foreground">{avgW1.toFixed(1)}%</h3>
             <p className="text-[10px] text-success mt-2 font-bold">↑ {t('dash.vsLastMonth')}</p>
           </div>
 
@@ -1147,7 +1147,7 @@ function RetentionView() {
               <p className="text-[10px] uppercase font-bold text-foreground/40 mb-1 tracking-widest">{t('ret.bestCohort')}</p>
               <Sparkles size={12} className="text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <h3 className="text-3xl font-bold text-white">{bestCohort?.cohort || "—"}</h3>
+            <h3 className="text-3xl font-bold text-foreground">{bestCohort?.cohort || "—"}</h3>
             <p className="text-[10px] text-primary mt-2 font-bold">{bestCohort?.size} users</p>
           </div>
 
@@ -1270,7 +1270,7 @@ function SettingsView() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
-      <h1 className="text-4xl font-bold text-white">{t('nav.settings')}</h1>
+      <h1 className="text-4xl font-bold text-foreground">{t('nav.settings')}</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Profile Section */}
@@ -1284,7 +1284,7 @@ function SettingsView() {
                 JD
               </div>
               <div>
-                <p className="text-lg font-bold text-white">John Doe</p>
+                <p className="text-lg font-bold text-foreground">John Doe</p>
                 <p className="text-sm text-foreground/40">{t('set.admin')}</p>
               </div>
             </div>
@@ -1317,7 +1317,7 @@ function SettingsView() {
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-8 h-8 rounded-full ${th.color} shadow-lg group-hover:scale-110 transition-transform`} />
-                  <span className={`font-bold transition-colors ${theme === th.id ? 'text-white' : 'text-foreground/60'}`}>
+                  <span className={`font-bold transition-colors ${theme === th.id ? 'text-foreground' : 'text-foreground/60'}`}>
                     {t(`theme.${th.id}`)}
                   </span>
                 </div>

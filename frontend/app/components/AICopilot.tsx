@@ -41,8 +41,13 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
               <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} />
               <YAxis hide />
               <Tooltip 
-                contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                itemStyle={{ color: '#fff', fontSize: '10px' }}
+                contentStyle={{ 
+                  backgroundColor: 'var(--card)', 
+                  borderColor: 'var(--card-border)', 
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
+                }}
+                itemStyle={{ color: 'var(--foreground)', fontSize: '10px' }}
                 formatter={(val: any) => new Intl.NumberFormat().format(val)}
               />
               <Area type="monotone" dataKey="value" stroke={colors.primary} strokeWidth={2} fillOpacity={1} fill="url(#chatColor)" />
@@ -220,7 +225,7 @@ export default function AICopilot() {
                 <span>{msg.role === "user" ? t('copilot.you') : t('copilot.ai')}</span>
               </div>
               
-              <div className="markdown-content text-sm leading-relaxed prose prose-invert prose-sm max-w-none">
+              <div className={`markdown-content text-sm leading-relaxed prose ${theme.includes('light') || theme === 'academic' ? '' : 'prose-invert'} prose-sm max-w-none`}>
                 <ReactMarkdown>{msg.content.split('```json')[0]}</ReactMarkdown>
               </div>
 
@@ -328,7 +333,7 @@ export default function AICopilot() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={t('copilot.placeholder')}
-            className="w-full bg-white/10 border border-white/10 rounded-xl py-2 pl-4 pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 text-white placeholder-white/40"
+            className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-4 pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 text-foreground placeholder-foreground/40"
             disabled={isLoading}
           />
           <button 

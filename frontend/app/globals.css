@@ -43,28 +43,28 @@
 }
 
 .theme-academic {
-  --background: #f8fafc;
-  --foreground: #334155;
-  --foreground-rgb: 51, 65, 85;
-  --primary: #475569;
-  --primary-rgb: 71, 85, 105;
-  --secondary: #94a3b8;
-  --secondary-rgb: 148, 163, 184;
-  --card: rgba(255, 255, 255, 0.9);
-  --card-border: rgba(0, 0, 0, 0.1);
+  --background: #f1f5f9;
+  --foreground: #0f172a;
+  --foreground-rgb: 15, 23, 42;
+  --primary: #1e293b;
+  --primary-rgb: 30, 41, 59;
+  --secondary: #475569;
+  --secondary-rgb: 71, 85, 105;
+  --card: #ffffff;
+  --card-border: rgba(15, 23, 42, 0.12);
   --primary-foreground: #ffffff;
 }
 
 .theme-corporate-light {
   --background: #ffffff;
-  --foreground: #1e293b;
-  --foreground-rgb: 30, 41, 59;
-  --primary: #2563eb;
-  --primary-rgb: 37, 99, 235;
-  --secondary: #64748b;
-  --secondary-rgb: 100, 116, 139;
-  --card: rgba(255, 255, 255, 0.95);
-  --card-border: rgba(0, 0, 0, 0.05);
+  --foreground: #020617;
+  --foreground-rgb: 2, 6, 23;
+  --primary: #1d4ed8;
+  --primary-rgb: 29, 78, 216;
+  --secondary: #3b82f6;
+  --secondary-rgb: 59, 130, 246;
+  --card: #ffffff;
+  --card-border: rgba(2, 6, 23, 0.1);
   --primary-foreground: #ffffff;
 }
 
@@ -97,12 +97,12 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--card-border);
   border-radius: 1.5rem;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  box-shadow: 0 10px 30px rgba(var(--foreground-rgb), 0.05);
 }
 
 .glass-button {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white !important;
+  color: var(--primary-foreground) !important;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 0.75rem;
