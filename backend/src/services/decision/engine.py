@@ -2,7 +2,7 @@ from typing import List, Dict
 
 def make_decisions(data: List[Dict], anomalies: List[float]) -> List[Dict]:
     decisions = []
-    total_revenue = sum(d.get("revenue", 0) for d in data)
+    total_revenue = sum(d.get("revenue_usd", 0) for d in data)
     
     # 🔴 Rule 1: anomalies
     if anomalies:

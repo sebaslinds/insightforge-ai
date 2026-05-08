@@ -1,5 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from schemas.ask import AskRequest
+from core.security import get_current_user
+from core.tenant_models import AdminUser
 from services.ai.ai_service import generate_sql, generate_insight
 from services.query.query_service import run_query
 from services.decision.engine import make_decisions
@@ -10,15 +12,15 @@ import pandas as pd
 router = APIRouter()
 
 @router.post("/")
-async def ask(req: AskRequest):
+async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_user)):
     # 1. SQL generation (keyword-based)
     sql = generate_sql(req.question)
 
-    # 2. Data query depuis PostgreSQL
-    data = run_query(sql)
+    # 2. Data query depuis PostgreSQL avec filtrage tenant
+    data = run_query(sql, {"tenant_id": current_user.tenant_id})
 
-    # 3. Anomaly detection simple
-    anomalies = [1000] if any(d.get("revenue", 0) > 500 for d in data) else []
+    # 3. Anomaly detection simple (revenue_usd est le nom de colonne correct)
+    anomalies = [1000] if any(d.get("revenue_usd", 0) > 500 for d in data) else []
 
     # 4. Decision Engine
     decisions = make_decisions(data, anomalies)

@@ -7,21 +7,24 @@ from core.config import get_settings
 def generate_sql(question: str) -> str:
     """Génère une requête SQL simplifiée à partir d'une question NL."""
     q = question.lower()
+    t_filter = "WHERE tenant_id = :tenant_id"
+    
     if "plan" in q or "répartition" in q or "distribution" in q or "conversion" in q or "taux" in q:
-        return "SELECT plan, COUNT(*) as users FROM users GROUP BY plan ORDER BY users DESC"
+        return f"SELECT plan, COUNT(*) as users FROM users {t_filter} GROUP BY plan ORDER BY users DESC"
     if "cohort" in q or "cohorte" in q or "semaine" in q or "week" in q:
-        return "SELECT plan, segment, COUNT(*) as user_count FROM users GROUP BY plan, segment"
+        return f"SELECT plan, segment, COUNT(*) as user_count FROM users {t_filter} GROUP BY plan, segment"
     if "user" in q or "utilisateur" in q or "combien" in q:
-        return "SELECT plan, segment, COUNT(*) as user_count, AVG(engagement_score) as avg_engagement FROM users GROUP BY plan, segment"
+        return f"SELECT plan, segment, COUNT(*) as user_count, AVG(engagement_score) as avg_engagement FROM users {t_filter} GROUP BY plan, segment"
     if "churn" in q or "churned" in q:
-        return "SELECT plan, segment, COUNT(*) as churned_users, AVG(engagement_score) as avg_score_at_churn FROM users WHERE churned = true GROUP BY plan, segment"
+        return f"SELECT plan, segment, COUNT(*) as churned_users, AVG(engagement_score) as avg_score_at_churn FROM users {t_filter} AND churned = true GROUP BY plan, segment"
     if "segment" in q or "profil" in q:
-        return "SELECT segment, COUNT(*) as count, AVG(engagement_score) as avg_score, AVG(days_since_last_use) as avg_recency FROM users GROUP BY segment"
+        return f"SELECT segment, COUNT(*) as count, AVG(engagement_score) as avg_score, AVG(days_since_last_use) as avg_recency FROM users {t_filter} GROUP BY segment"
     if "event" in q or "événement" in q or "evenement" in q:
-        return "SELECT event_type, COUNT(*) as total_events, COUNT(DISTINCT user_id) as unique_users FROM events GROUP BY event_type ORDER BY total_events DESC LIMIT 10"
+        return f"SELECT event_type, COUNT(*) as total_events, COUNT(DISTINCT user_id) as unique_users FROM events {t_filter} GROUP BY event_type ORDER BY total_events DESC LIMIT 10"
     if "revenue" in q or "revenu" in q:
-        return "SELECT plan, COUNT(*) as users, SUM(CASE WHEN plan = 'Enterprise' THEN 499 WHEN plan = 'Pro' THEN 49 ELSE 0 END) as revenue_usd FROM users GROUP BY plan"
-    return "SELECT user_id, plan, segment, engagement_score, days_since_last_use FROM users ORDER BY engagement_score DESC LIMIT 50"
+        return f"SELECT plan, COUNT(*) as users, SUM(CASE WHEN LOWER(plan) = 'enterprise' THEN 499 WHEN LOWER(plan) = 'pro' THEN 49 ELSE 0 END) as revenue_usd FROM users {t_filter} GROUP BY plan"
+    
+    return f"SELECT user_id, plan, segment, engagement_score, days_since_last_use FROM users {t_filter} ORDER BY engagement_score DESC LIMIT 50"
 
 
 # ── GPT-4o Insight Generation ─────────────────────────────────────────────────
@@ -40,7 +43,8 @@ async def generate_insight(payload: dict, language: str = "en") -> str:
 
     try:
         from openai import AsyncOpenAI
-        client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        api_key = settings.OPENAI_API_KEY.strip()
+        client = AsyncOpenAI(api_key=api_key)
 
         FEATURE_DEFS = {
             "session_count_7d": "Nombre de sessions sur les 7 derniers jours. Indique la fréquence d'usage.",
@@ -89,6 +93,9 @@ async def generate_insight(payload: dict, language: str = "en") -> str:
         user_content = str(payload)
         if isinstance(payload, dict) and "prompt_override" in payload:
             user_content = payload["prompt_override"]
+
+        if not api_key:
+            return "Erreur : La clé OPENAI_API_KEY est vide ou non configurée." if language == "fr" else "Error: OPENAI_API_KEY is empty or not configured."
 
         response = await client.chat.completions.create(
             model="gpt-4o",
