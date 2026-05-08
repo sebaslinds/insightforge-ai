@@ -20,35 +20,43 @@
 6. **AI Copilot** 🤖
    - Generative AI assistant powered by **OpenAI GPT-4o** with dynamic Text-to-SQL capabilities, allowing executives to chat directly with their SaaS data.
 
+## ✨ Latest Features (v1.3.5)
+
+- **Interactive AI Charts** 📊: Click on any bar in the ML Models view to trigger an automated, deep-dive analysis in the AI Copilot.
+- **High-Precision Data Summary** 📈: The AI Copilot now utilizes real-time statistical aggregates from the entire PostgreSQL dataset (6,000+ users), ensuring accurate counts and distributions in chat responses.
+- **Explainable AI (XAI)** 💡: GPT-4o now provides detailed definitions for ML features and explains reasoning based on XGBoost information gain.
+- **McKinsey-Style UI** 🏢: High-density, professional executive dashboard with optimized data visualizations and glassmorphism aesthetics.
+
 ## 🧠 Tech Stack
 
-- **Frontend**: Next.js 14, React, Tailwind CSS, Recharts (Premium McKinsey-style Dark Mode UI)
-- **Backend**: FastAPI (Python 3.11), SQLAlchemy, Pydantic
-- **Machine Learning**: Scikit-Learn, XGBoost, Pandas
+- **Frontend**: Next.js 14, React, Tailwind CSS, Recharts (Interactive UI)
+- **Backend**: FastAPI (Python 3.11), SQLAlchemy, Pydantic, Pandas
+- **Machine Learning**: Scikit-Learn, XGBoost, K-Means
 - **AI & NLP**: OpenAI GPT-4o
-- **Database**: PostgreSQL
-- **Cloud Infrastructure**: Google Cloud Platform (Cloud Run, Cloud SQL, Artifact Registry, Cloud Build)
+- **Database**: PostgreSQL (Multi-tenant schema)
+- **Cloud Infrastructure**: Google Cloud Platform (Cloud Run, Cloud SQL)
 
 ## 🛠️ Local Development
 
 ### 1. Database Setup
 Ensure you have a local PostgreSQL instance running. Create a database named `insightforge`.
-Set your environment variables in the `.env` file (copy from `.env.example`).
+Set your environment variables in the `.env` file.
 ```env
 DATABASE_URL=postgresql://user:password@localhost/insightforge
 OPENAI_API_KEY=your-openai-api-key
+BACKEND_URL=http://localhost:8080
 ```
 
 ### 2. Backend (FastAPI)
 ```bash
 cd backend
 python -m venv .venv
-source .venv/Scripts/activate  # On Windows
+source .venv/Scripts/activate  # On Windows: .\.venv\Scripts\activate
 pip install -r requirements.txt
 # Seed the database with realistic SaaS data
 python src/seed_cloud.py
 # Run the API server
-uvicorn src.main:app --reload --port 8000
+uvicorn src.main:app --reload --port 8080
 ```
 
 ### 3. Frontend (Next.js)
