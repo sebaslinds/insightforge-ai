@@ -1373,26 +1373,26 @@ function LoginView({ onLogin }: { onLogin: () => void }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-xs uppercase font-bold text-foreground/60 mb-2 block">{t('login.email')}</label>
+            <label className="text-xs uppercase font-bold text-foreground/80 mb-2 block">{t('login.email')}</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" size={18} />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60" size={18} />
               <input 
                 type="email" required
                 value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-black/10 dark:border-white/10 rounded-lg py-3 pl-10 pr-4 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/20 rounded-lg py-3 pl-10 pr-4 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
                 placeholder="admin@acme.com"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs uppercase font-bold text-foreground/60 mb-2 block">{t('login.password')}</label>
+            <label className="text-xs uppercase font-bold text-foreground/80 mb-2 block">{t('login.password')}</label>
             <div className="relative">
-              <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" size={18} />
+              <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60" size={18} />
               <input 
                 type="password" required
                 value={password} onChange={e => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-black/10 dark:border-white/10 rounded-lg py-3 pl-10 pr-4 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/20 rounded-lg py-3 pl-10 pr-4 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
                 placeholder="••••••••"
               />
             </div>
