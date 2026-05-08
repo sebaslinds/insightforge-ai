@@ -110,7 +110,7 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
 }
 
 export default function AICopilot() {
-  const { t, lang } = useLanguage();
+  const { t, lang, theme } = useLanguage();
   
   const [messages, setMessages] = useState<Message[]>([
     {
