@@ -83,14 +83,14 @@ function KPICard({ title, value, icon: Icon, trend, color, t, granularity, detai
           {isRevenue && details ? (
             <div className="space-y-1 w-full">
               {Object.entries(details).map(([plan, data]: [string, any]) => (
-                <div key={plan} className="flex justify-between text-[10px] text-white/90">
+                <div key={plan} className="flex justify-between text-[10px] text-foreground/90">
                   <span className="capitalize">{plan} ({data.count} users)</span>
                   <span className="font-bold">${data.revenue.toLocaleString()}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-[13px] text-white/90 leading-snug font-medium text-center">
+            <p className="text-[13px] text-foreground/90 leading-snug font-medium text-center">
               {title.toLowerCase().includes('revenu') || title.toLowerCase().includes('revenue') ? t('dash.revenueDesc') :
                title.toLowerCase().includes('user') ? t('dash.usersDesc') :
                title.toLowerCase().includes('engagement') ? t('dash.engagementDesc') :
@@ -166,7 +166,7 @@ function DashboardView() {
               <p className="text-foreground/60">{t('dash.subtitle')}</p>
             </div>
             <div className="flex space-x-3">
-              <button onClick={handleGenerateReport} className="glass-button px-4 py-2 text-sm font-medium rounded-lg text-white flex items-center gap-2">
+              <button onClick={handleGenerateReport} className="glass-button px-4 py-2 text-sm font-medium rounded-lg text-primary-foreground flex items-center gap-2">
                 <FileText size={16} /> {t('dash.genReport')}
               </button>
             </div>
@@ -176,7 +176,7 @@ function DashboardView() {
             <div className="glass-panel p-6 border-primary/30 bg-primary/5 animate-in slide-in-from-top duration-500 shrink-0">
               <div className="flex justify-between items-start mb-4">
                 <h3 className="text-lg font-bold flex items-center gap-2"><Sparkles className="text-primary" /> {t('dash.reportGenerated')}</h3>
-                <button onClick={() => setReport(null)} className="text-foreground/40 hover:text-white">{t('dash.close')}</button>
+                <button onClick={() => setReport(null)} className="text-foreground/40 hover:text-primary">{t('dash.close')}</button>
               </div>
               <pre className="whitespace-pre-wrap text-sm text-foreground/80 font-mono bg-black/20 p-4 rounded-lg">{report}</pre>
             </div>
@@ -217,7 +217,7 @@ function DashboardView() {
                       <div key={i} className="flex items-center justify-between text-[11px] p-2 rounded-lg bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
                          <div className="flex items-center gap-2">
                             <div className={`w-1.5 h-1.5 rounded-full bg-${log.color}`} />
-                            <span className="font-bold text-white/80">{log.user}</span>
+                            <span className="font-bold text-foreground/80">{log.user}</span>
                             <span className="text-foreground/40">{log.event}</span>
                          </div>
                          <span className="text-[9px] opacity-30">{log.time}</span>
