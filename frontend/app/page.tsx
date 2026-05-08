@@ -880,7 +880,11 @@ function ProjectView() {
           {t('project.visionDesc')}
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-white/5 hover:border-amber-400/30 transition-colors">
+            <h4 className="text-lg font-bold mb-2 text-amber-400">{t('project.saasTitle')}</h4>
+            <p className="text-sm text-foreground/80 leading-relaxed">{t('project.saasDesc')}</p>
+          </div>
           <div className="bg-slate-800/50 p-6 rounded-xl border border-white/5 hover:border-blue-400/30 transition-colors">
             <h4 className="text-lg font-bold mb-2 text-blue-400">{t('project.whatTitle')}</h4>
             <p className="text-sm text-foreground/80 leading-relaxed">{t('project.whatDesc')}</p>
