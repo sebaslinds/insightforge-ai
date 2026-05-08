@@ -1364,35 +1364,35 @@ function LoginView({ onLogin }: { onLogin: () => void }) {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="glass-panel p-8 w-full max-w-md animate-in fade-in zoom-in duration-300">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-primary/30">
+          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-primary/20">
             <Lock className="text-primary" size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">{t('login.title')}</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t('login.title')}</h1>
           <p className="text-foreground/60">{t('login.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-xs uppercase font-bold text-foreground/40 mb-2 block">{t('login.email')}</label>
+            <label className="text-xs uppercase font-bold text-foreground/60 mb-2 block">{t('login.email')}</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" size={18} />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" size={18} />
               <input 
                 type="email" required
                 value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-white/5 border border-black/10 dark:border-white/10 rounded-lg py-3 pl-10 pr-4 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
                 placeholder="admin@acme.com"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs uppercase font-bold text-foreground/40 mb-2 block">{t('login.password')}</label>
+            <label className="text-xs uppercase font-bold text-foreground/60 mb-2 block">{t('login.password')}</label>
             <div className="relative">
-              <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" size={18} />
+              <Key className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" size={18} />
               <input 
                 type="password" required
                 value={password} onChange={e => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-white/5 border border-black/10 dark:border-white/10 rounded-lg py-3 pl-10 pr-4 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -1409,7 +1409,7 @@ function LoginView({ onLogin }: { onLogin: () => void }) {
             {t('login.button')}
           </button>
         </form>
-        <p className="text-[10px] text-center mt-6 text-foreground/30 italic">{t('login.demo')}</p>
+        <p className="text-[10px] text-center mt-6 text-foreground/60 italic">{t('login.demo')}</p>
       </div>
     </div>
   );
