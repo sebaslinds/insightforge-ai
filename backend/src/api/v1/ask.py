@@ -13,8 +13,8 @@ router = APIRouter()
 
 @router.post("/")
 async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_user)):
-    # 1. SQL generation (keyword-based)
-    sql = generate_sql(req.question)
+    # 1. SQL generation via GPT-4o (Text-to-SQL)
+    sql = await generate_sql(req.question)
 
     # 2. Data query depuis PostgreSQL avec filtrage tenant
     data = run_query(sql, {"tenant_id": current_user.tenant_id})
@@ -29,6 +29,8 @@ async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_use
     df = pd.DataFrame(data)
     data_summary = ""
     if not df.empty:
+        # Nettoyage des valeurs manquantes pour éviter 'NaN' dans l'IA
+        df = df.fillna("non_catégorisé")
         if len(df) > 50:
             # Si trop de données, on donne un résumé statistique par colonne
             data_summary = f"Total records: {len(df)}\n"

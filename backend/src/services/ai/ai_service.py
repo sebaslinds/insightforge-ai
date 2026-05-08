@@ -4,27 +4,64 @@ AI Service : génère SQL (mock) et insights via OpenAI GPT-4o (réel).
 from core.config import get_settings
 
 # ── SQL Generation (mock, sera remplacé par Text-to-SQL GPT) ──────────────────
-def generate_sql(question: str) -> str:
-    """Génère une requête SQL simplifiée à partir d'une question NL."""
+async def generate_sql(question: str) -> str:
+    """Génère une requête SQL précise via GPT-4o (Text-to-SQL)."""
+    settings = get_settings()
+    if not settings.OPENAI_API_KEY:
+        return _generate_sql_mock(question)
+
+    try:
+        from openai import AsyncOpenAI
+        client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY.strip())
+
+        schema = """
+        Table 'users': user_id, tenant_id, signup_date, plan ('free', 'pro', 'enterprise'), segment ('power_user', 'casual', 'at_risk', 'dormant'), session_count_30d, session_count_7d, avg_session_duration_min, feature_breadth, days_since_last_use, engagement_score, churn_score, churned (boolean).
+        Table 'events': user_id, tenant_id, event_type ('page_view', 'feature_use', 'session_start'), feature, timestamp.
+        """
+
+        prompt = (
+            f"Tu es un expert SQL pour PostgreSQL. Traduis la question SaaS suivante en SQL précis.\n"
+            f"Schéma :\n{schema}\n\n"
+            "RÈGLES CRITIQUES :\n"
+            "1. Utilise TOUJOURS 'WHERE tenant_id = :tenant_id' pour isoler les données.\n"
+            "2. Pour le REVENU : SUM(CASE WHEN LOWER(plan) = 'enterprise' THEN 499 WHEN LOWER(plan) = 'pro' THEN 49 ELSE 0 END) as revenue_usd.\n"
+            "3. SEGMENTS : Si un segment est NULL, ignore-le dans les répartitions (`WHERE segment IS NOT NULL`) ou utilise `COALESCE(segment, 'non_catégorisé')`.\n"
+            "4. Privilégie les AGRÉGATIONS (COUNT, AVG, SUM) pour répondre à des questions globales.\n"
+            "5. Retourne UNIQUEMENT le code SQL brut. Pas de markdown, pas d'explications.\n"
+            "6. Si la question est vague, fais un résumé : plan, segment, COUNT(*) as user_count, AVG(engagement_score) as avg_score.\n"
+            "7. Ne dépasse pas 100 lignes de résultat (LIMIT 100).\n"
+        )
+
+        response = await client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": question},
+            ],
+            temperature=0,
+        )
+        sql = response.choices[0].message.content.strip()
+        # Nettoyage si Markdown présent
+        if "```sql" in sql:
+            sql = sql.split("```sql")[1].split("```")[0].strip()
+        elif "```" in sql:
+            sql = sql.split("```")[1].strip()
+        return sql
+
+    except Exception as e:
+        print(f"[AI Service] SQL Gen Error: {e}")
+        return _generate_sql_mock(question)
+
+
+def _generate_sql_mock(question: str) -> str:
+    """Fallback si GPT échoue ou pas de clé API."""
     q = question.lower()
     t_filter = "WHERE tenant_id = :tenant_id"
-    
-    if "plan" in q or "répartition" in q or "distribution" in q or "conversion" in q or "taux" in q:
-        return f"SELECT plan, COUNT(*) as users FROM users {t_filter} GROUP BY plan ORDER BY users DESC"
-    if "cohort" in q or "cohorte" in q or "semaine" in q or "week" in q:
-        return f"SELECT plan, segment, COUNT(*) as user_count FROM users {t_filter} GROUP BY plan, segment"
-    if "user" in q or "utilisateur" in q or "combien" in q:
-        return f"SELECT plan, segment, COUNT(*) as user_count, AVG(engagement_score) as avg_engagement FROM users {t_filter} GROUP BY plan, segment"
-    if "churn" in q or "churned" in q:
-        return f"SELECT plan, segment, COUNT(*) as churned_users, AVG(engagement_score) as avg_score_at_churn FROM users {t_filter} AND churned = true GROUP BY plan, segment"
-    if "segment" in q or "profil" in q:
-        return f"SELECT segment, COUNT(*) as count, AVG(engagement_score) as avg_score, AVG(days_since_last_use) as avg_recency FROM users {t_filter} GROUP BY segment"
-    if "event" in q or "événement" in q or "evenement" in q:
-        return f"SELECT event_type, COUNT(*) as total_events, COUNT(DISTINCT user_id) as unique_users FROM events {t_filter} GROUP BY event_type ORDER BY total_events DESC LIMIT 10"
     if "revenue" in q or "revenu" in q:
         return f"SELECT plan, COUNT(*) as users, SUM(CASE WHEN LOWER(plan) = 'enterprise' THEN 499 WHEN LOWER(plan) = 'pro' THEN 49 ELSE 0 END) as revenue_usd FROM users {t_filter} GROUP BY plan"
-    
-    return f"SELECT user_id, plan, segment, engagement_score, days_since_last_use FROM users {t_filter} ORDER BY engagement_score DESC LIMIT 50"
+    if "plan" in q or "distribution" in q:
+        return f"SELECT plan, COUNT(*) as count FROM users {t_filter} GROUP BY plan"
+    return f"SELECT plan, segment, COUNT(*) as user_count, AVG(engagement_score) as avg_score FROM users {t_filter} GROUP BY plan, segment"
 
 
 # ── GPT-4o Insight Generation ─────────────────────────────────────────────────
