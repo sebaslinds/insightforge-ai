@@ -2,7 +2,7 @@
 
 # Configuration - MODIFIEZ CES VALEURS
 PROJECT_ID="insightforge-ai" # Remplacez par votre ID de projet
-REGION="us-central1"
+REGION="northamerica-northeast1"
 REPO_NAME="insightforge-repo"
 
 echo "--- Déploiement de InsightForge AI sur Google Cloud Run ---"
@@ -18,12 +18,12 @@ gcloud artifacts repositories create $REPO_NAME \
 echo "[2/4] Construction et envoi de l'image BACKEND..."
 gcloud builds submit --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/backend ./backend
 
-# 3. Build et Push du Frontend
-# Note: On passe l'URL du backend en argument de build pour Next.js
+# 3. Récupérer l'URL du Backend pour le Frontend
+# Note: On a besoin de l'URL au moment du build Next.js
 echo "[3/4] Construction et envoi de l'image FRONTEND..."
-# On récupère l'URL du backend plus tard ou on la définit ici
-# Pour le premier déploiement, on peut laisser vide et mettre à jour après
-gcloud builds submit --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/frontend ./frontend
+BACKEND_URL="https://backend-458613429367.northamerica-northeast1.run.app"
+gcloud builds submit --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/frontend \
+    --build-arg NEXT_PUBLIC_API_URL=$BACKEND_URL ./frontend
 
 # 4. Déploiement sur Cloud Run
 echo "[4/4] Déploiement sur Cloud Run..."
@@ -43,7 +43,7 @@ gcloud run deploy frontend \
     --platform managed \
     --region $REGION \
     --allow-unauthenticated \
-    --set-env-vars "NODE_ENV=production"
+    --set-env-vars "NODE_ENV=production,NEXT_PUBLIC_API_URL=$BACKEND_URL"
 
 echo "--- Déploiement terminé ! ---"
 echo "URL Backend : $(gcloud run services describe backend --format='value(status.url)' --region $REGION)"

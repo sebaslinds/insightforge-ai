@@ -46,8 +46,8 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
 
     if (data.type === 'area') {
       return (
-        <div style={{ height: chartHeight, width: '100%' }}>
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[160px] w-full relative">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <AreaChart data={data.items} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="chatColor" x1="0" y1="0" x2="0" y2="1">
@@ -69,8 +69,8 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
     if (data.type === 'pie') {
       const PIE_COLORS = [colors.primary, colors.secondary, '#f59e0b', '#ef4444', '#10b981'];
       return (
-        <div style={{ height: chartHeight, width: '100%' }}>
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[160px] w-full relative">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <PieChart>
               <Pie
                 data={data.items}
@@ -90,8 +90,8 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
 
     if (data.type === 'bar') {
       return (
-        <div style={{ height: chartHeight, width: '100%' }}>
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[160px] w-full relative">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <BarChart data={data.items} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} />
@@ -231,7 +231,7 @@ export default function AICopilot() {
               </div>
 
               {msg.content.includes('```json') && (
-                <div className="mt-4 bg-black/20 p-4 rounded-xl border border-white/5 h-48 w-full">
+                <div className="mt-4 bg-black/40 p-4 rounded-2xl border border-white/10 w-full min-h-[180px] flex flex-col justify-center">
                   <ChatVisualizer jsonStr={msg.content.split('```json')[1].split('```')[0]} />
                 </div>
               )}

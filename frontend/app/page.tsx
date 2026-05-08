@@ -620,26 +620,30 @@ function MLView() {
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={churnScores.slice(0, 20)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
-                <XAxis dataKey="user_id" tick={false} stroke="rgba(var(--foreground-rgb), 0.3)" />
-                <YAxis stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis dataKey="user_id" tick={false} stroke="rgba(255,255,255,0.1)" />
+                <YAxis stroke="rgba(255,255,255,0.1)" tick={{fill: 'rgba(255,255,255,0.3)', fontSize: 10}} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                  contentStyle={{ backgroundColor: 'rgba(10, 17, 24, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
                   itemStyle={{ color: '#fff' }}
-                  formatter={(value: any) => new Intl.NumberFormat().format(value)}
+                  cursor={{fill: 'rgba(255,255,255,0.05)'}}
+                  formatter={(value: any) => `${(Number(value) * 100).toFixed(1)}%`}
                 />
                 <Bar 
                   dataKey="churn_score" 
-                  fill="#ef4444" 
-                  radius={[4, 4, 0, 0]} 
-                  className="cursor-pointer"
+                  radius={[6, 6, 0, 0]} 
+                  className="cursor-pointer transition-all duration-300 hover:opacity-80"
                   onClick={(data: any) => {
                     const query = lang === 'fr'
                       ? `Analyse le score de churn pour l'utilisateur ${data.user_id}. Pourquoi est-il de ${(data.churn_score * 100).toFixed(1)}% ?`
                       : `Analyze the churn score for user ${data.user_id}. Why is it ${(data.churn_score * 100).toFixed(1)}%?`;
                     window.dispatchEvent(new CustomEvent('insightforge-query', { detail: query }));
                   }}
-                />
+                >
+                  {churnScores.slice(0, 20).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.churn_score > 0.7 ? '#ef4444' : entry.churn_score > 0.4 ? '#f59e0b' : '#10b981'} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -663,15 +667,26 @@ function MLView() {
                 layout="vertical"
                 margin={{ left: 30, right: 30 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" horizontal={false} />
-                <XAxis type="number" stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} />
-                <YAxis dataKey="name" type="category" stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} width={120} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
+                <XAxis type="number" stroke="rgba(255,255,255,0.1)" tick={{fill: 'rgba(255,255,255,0.3)', fontSize: 10}} />
+                <YAxis dataKey="name" type="category" stroke="rgba(255,255,255,0.1)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 10}} width={120} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                  contentStyle={{ backgroundColor: 'rgba(10, 17, 24, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
                   itemStyle={{ color: '#fff' }}
                   formatter={(value: any) => (value as number).toFixed(4)}
                 />
-                <Bar dataKey="value" fill="var(--primary)" radius={[0, 4, 4, 0]} />
+                <Bar 
+                  dataKey="value" 
+                  fill="var(--primary)" 
+                  radius={[0, 6, 6, 0]} 
+                  className="cursor-pointer transition-all duration-300 hover:opacity-80"
+                  onClick={(data: any) => {
+                    const query = lang === 'fr'
+                      ? `Explique l'importance de la variable "${data.name}" dans le modèle XGBoost. Comment influence-t-elle la probabilité de churn ?`
+                      : `Explain the importance of the "${data.name}" feature in the XGBoost model. How does it influence churn probability?`;
+                    window.dispatchEvent(new CustomEvent('insightforge-query', { detail: query }));
+                  }}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

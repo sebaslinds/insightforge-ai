@@ -41,14 +41,15 @@ async def log_origin(request: Request, call_next):
 # CORS : On revient à une liste explicite incluant TOUTES les variantes possibles
 origins = [
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
     "https://frontend-gqaawjux7q-nn.a.run.app",
     "https://frontend-458613429367.northamerica-northeast1.run.app",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # On force le wildcard car les credentials sont à False
-    allow_credentials=False,
+    allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

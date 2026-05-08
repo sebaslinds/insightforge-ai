@@ -40,27 +40,41 @@ async def generate_insight(payload: dict, language: str = "en") -> str:
         from openai import AsyncOpenAI
         client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
+        FEATURE_DEFS = {
+            "session_count_7d": "Nombre de sessions sur les 7 derniers jours. Indique la fréquence d'usage.",
+            "feature_breadth": "Nombre de fonctionnalités uniques utilisées. Indique la profondeur de l'adoption produit.",
+            "avg_session_duration": "Durée moyenne des sessions en minutes.",
+            "days_since_last_use": "Nombre de jours depuis la dernière activité. Indique la récence.",
+            "engagement_score": "Score composite (0-100) calculé par notre moteur à partir de l'activité globale."
+        }
+
         system_prompt = (
             "Tu es un analyste SaaS expert en rétention client et en ML. "
             "Analyse les données fournies et donne une réponse concise, chiffrée et actionnable en français. "
-            "Utilise le Markdown pour rendre tes réponses plus graphiques : utilise des tableaux pour les chiffres, "
-            "des listes à puces pour les points clés et des émojis pour illustrer tes propos. "
-            "Si les données s'y prêtent (ex: répartition par segment, tendance de revenus), inclus impérativement un bloc JSON à la fin de ta réponse pour générer un graphique Recharts avec ce format exact : "
+            "IMPORTANT: Utilise les chiffres du 'data_summary' (qui contient les totaux et distributions réels de la BD) pour tes calculs et tes tableaux. "
+            "Ne te base pas sur un échantillon partiel. Si le résumé dit 'Total records: 6272', utilise ce chiffre.\n\n"
+            f"Définitions des variables ML :\n{FEATURE_DEFS}\n\n"
+            "L'importance des variables (feature_importance) est calculée par le modèle XGBoost via le gain d'information : "
+            "plus une variable aide à réduire l'incertitude sur la prédiction du churn, plus son importance est élevée.\n\n"
+            "Utilise le Markdown : tableaux pour les chiffres, listes à puces pour les points clés. "
+            "Inclus impérativement un bloc JSON à la fin pour un graphique Recharts si pertinent :\n"
             "```json\n"
             "{\"type\": \"area\" | \"pie\" | \"bar\", \"items\": [{\"name\": \"label\", \"value\": 123}, ...]}\n"
-            "```\n"
-            "Sois visuel, moderne et précis."
+            "```"
             if language == "fr"
             else
             "You are a SaaS analyst expert in customer retention and ML. "
             "Analyze the provided data and give a concise, quantified, and actionable response in English. "
-            "Use Markdown to make your responses more graphical: use tables for numbers, "
-            "bullet points for key takeaways, and emojis to illustrate your points. "
-            "If the data allows (e.g. segment breakdown, revenue trend), always include a JSON block at the end of your response to generate a Recharts graph with this exact format: "
+            "IMPORTANT: Use the numbers from 'data_summary' (real DB totals and distributions) for your calculations. "
+            "Do not use a partial sample. If the summary says 'Total records: 6272', use that figure.\n\n"
+            f"ML Feature Definitions:\n{FEATURE_DEFS}\n\n"
+            "Feature importance is calculated by the XGBoost model via information gain: "
+            "the more a variable helps reduce uncertainty in churn prediction, the higher its importance.\n\n"
+            "Use Markdown: tables for numbers, bullet points for key takeaways. "
+            "Always include a JSON block at the end for a Recharts graph if relevant:\n"
             "```json\n"
             "{\"type\": \"area\" | \"pie\" | \"bar\", \"items\": [{\"name\": \"label\", \"value\": 123}, ...]}\n"
-            "```\n"
-            "Be visual, modern and precise."
+            "```"
         )
 
         user_content = str(payload)
