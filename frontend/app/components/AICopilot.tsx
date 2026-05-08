@@ -5,6 +5,7 @@ import { Send, Bot, User, Loader2, AlertTriangle, CheckCircle, Lightbulb, Target
 import { askAI } from "@/lib/api";
 import { useLanguage, THEME_COLORS } from "@/lib/i18n";
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 
 type Message = {
@@ -19,6 +20,23 @@ type Message = {
 function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
   const { theme } = useLanguage();
   const colors = THEME_COLORS[theme] || THEME_COLORS.midnight;
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background/95 backdrop-blur-md border border-card-border p-3 rounded-xl shadow-2xl">
+          <p className="text-foreground font-bold mb-1 border-b border-foreground/10 pb-1">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} className="text-primary text-sm font-bold flex justify-between gap-4">
+              <span className="opacity-70">{entry.name}:</span>
+              <span>{new Intl.NumberFormat().format(entry.value)}</span>
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
 
   try {
     const data = JSON.parse(jsonStr);
@@ -40,16 +58,7 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} />
               <YAxis hide />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'var(--card)', 
-                  borderColor: 'var(--card-border)', 
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
-                }}
-                itemStyle={{ color: 'var(--foreground)', fontSize: '10px' }}
-                formatter={(val: any) => new Intl.NumberFormat().format(val)}
-              />
+              <Tooltip content={<CustomTooltip />} />
               <Area type="monotone" dataKey="value" stroke={colors.primary} strokeWidth={2} fillOpacity={1} fill="url(#chatColor)" />
             </AreaChart>
           </ResponsiveContainer>
@@ -72,11 +81,7 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
                   <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                itemStyle={{ color: '#fff', fontSize: '10px' }}
-                formatter={(val: any) => new Intl.NumberFormat().format(val)}
-              />
+              <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -91,11 +96,7 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} />
               <YAxis hide />
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                itemStyle={{ color: '#fff', fontSize: '10px' }}
-                formatter={(val: any) => new Intl.NumberFormat().format(val)}
-              />
+              <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="value" fill={colors.primary} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -226,7 +227,7 @@ export default function AICopilot() {
               </div>
               
               <div className={`markdown-content text-sm leading-relaxed prose ${theme.includes('light') || theme === 'academic' ? '' : 'prose-invert'} prose-sm max-w-none`}>
-                <ReactMarkdown>{msg.content.split('```json')[0]}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content.split('```json')[0]}</ReactMarkdown>
               </div>
 
               {msg.content.includes('```json') && (
