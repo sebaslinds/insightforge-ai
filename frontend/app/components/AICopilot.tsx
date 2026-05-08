@@ -291,7 +291,7 @@ export default function AICopilot() {
                     <button
                       key={idx}
                       onClick={() => sendQuery(prompt)}
-                      className="text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary-foreground transition-colors text-left"
+                      className="text-sm px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary transition-colors text-left font-medium"
                     >
                       {prompt}
                     </button>

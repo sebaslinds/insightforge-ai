@@ -39,8 +39,8 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
                 onClick={() => onViewChange(item.id)}
                 className={`w-full flex items-center space-x-3 transition-all p-3 rounded-xl ${
                   isActive 
-                    ? 'text-white shadow-lg scale-105' 
-                    : 'text-foreground/80 hover:text-white hover:bg-white/5 hover:scale-105'
+                    ? 'text-primary-foreground shadow-lg scale-105' 
+                    : 'text-foreground/80 hover:text-primary hover:bg-primary/10 hover:scale-105'
                 }`}
                 style={isActive ? { backgroundColor: 'var(--primary)', boxShadow: '0 10px 15px -3px rgba(var(--primary-rgb), 0.2)' } : {}}
               >
@@ -55,7 +55,7 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
       <div className="p-6 space-y-4">
         <button
           onClick={() => setLang(lang === 'en' ? 'fr' : 'en')}
-          className="w-full flex items-center justify-between transition-all p-3 rounded-xl text-foreground/80 hover:text-white hover:bg-white/5 hover:scale-105 border border-white/5"
+          className="w-full flex items-center justify-between transition-all p-3 rounded-xl text-foreground/80 hover:text-primary hover:bg-primary/10 hover:scale-105 border border-white/5"
         >
           <div className="flex items-center space-x-3">
             <Globe size={20} />
@@ -68,8 +68,8 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
           onClick={() => onViewChange('settings')}
           className={`w-full flex items-center space-x-3 transition-all p-3 rounded-xl ${
             activeView === 'settings'
-              ? 'text-white shadow-lg scale-105' 
-              : 'text-foreground/80 hover:text-white hover:bg-white/5 hover:scale-105'
+              ? 'text-primary-foreground shadow-lg scale-105' 
+              : 'text-foreground/80 hover:text-primary hover:bg-primary/10 hover:scale-105'
           }`}
           style={activeView === 'settings' ? { backgroundColor: 'var(--primary)', boxShadow: '0 10px 15px -3px rgba(var(--primary-rgb), 0.2)' } : {}}
         >
