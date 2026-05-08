@@ -41,12 +41,15 @@ if ($service -eq "all" -or $service -eq "frontend") {
 Write-Host "[5/5] Déploiement sur Cloud Run..." -ForegroundColor Yellow
 
 if ($service -eq "all" -or $service -eq "backend") {
+    # Note: Assurez-vous que le secret 'OPENAI_API_KEY' existe dans Secret Manager
+    # et que le compte de service a le rôle 'roles/secretmanager.secretAccessor'.
     & $GCLOUD_PATH run deploy backend `
         --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/backend" `
         --platform managed --region $REGION --allow-unauthenticated `
         --add-cloudsql-instances "${PROJECT_ID}:${REGION}:insightforge-db" `
         --service-account "insightforge-app-sa@${PROJECT_ID}.iam.gserviceaccount.com" `
-        --set-env-vars "ENVIRONMENT=production,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GCS_BUCKET=insightforge-assets-${PROJECT_ID},CLOUD_SQL_CONNECTION_NAME=${PROJECT_ID}:${REGION}:insightforge-db,DB_USER=postgres,DB_PASS=ForgeAI2026,DB_NAME=insightforge,OPENAI_API_KEY=PLACEHOLDER_KEY"
+        --set-env-vars "ENVIRONMENT=production,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GCS_BUCKET=insightforge-assets-${PROJECT_ID},CLOUD_SQL_CONNECTION_NAME=${PROJECT_ID}:${REGION}:insightforge-db,DB_USER=postgres,DB_PASS=ForgeAI2026,DB_NAME=insightforge" `
+        --update-secrets "OPENAI_API_KEY=OPENAI_API_KEY:latest"
 }
 
 if ($service -eq "all" -or $service -eq "frontend") {
