@@ -7,7 +7,7 @@ from core.config import get_settings
 def generate_sql(question: str) -> str:
     """Génère une requête SQL simplifiée à partir d'une question NL."""
     q = question.lower()
-    if "plan" in q or "répartition" in q or "distribution" in q:
+    if "plan" in q or "répartition" in q or "distribution" in q or "conversion" in q or "taux" in q:
         return "SELECT plan, COUNT(*) as users FROM users GROUP BY plan ORDER BY users DESC"
     if "user" in q or "utilisateur" in q or "combien" in q:
         return "SELECT plan, segment, COUNT(*) as count FROM users GROUP BY plan, segment"

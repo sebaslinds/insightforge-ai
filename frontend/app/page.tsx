@@ -410,7 +410,17 @@ function DashboardView() {
 
             <div className="glass-panel p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-semibold">Conversion Rate (%)</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold">Conversion Rate (%)</h3>
+                  <div className="group relative">
+                    <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 p-2 text-xs bg-slate-800 text-gray-200 rounded border border-slate-700 z-10 text-center shadow-lg">
+                      {lang === 'fr' 
+                        ? "Calculé selon le % d'utilisateurs avec un plan payant (Pro, Enterprise) sur l'ensemble des utilisateurs actifs (Base GCP)."
+                        : "Calculated as the % of users with a paid plan (Pro, Enterprise) out of all active users (GCP Data)."}
+                    </div>
+                  </div>
+                </div>
                 <div className="text-2xl font-bold text-success">{conversions?.rate}%</div>
               </div>
               <div className="h-64 w-full">
@@ -866,9 +876,24 @@ function ProjectView() {
         <h3 className="text-2xl font-bold text-primary mb-4 flex items-center gap-3">
           <Globe size={28}/> {t('project.vision')}
         </h3>
-        <p className="text-lg text-white/80 leading-relaxed max-w-4xl">
+        <p className="text-lg text-white/80 leading-relaxed max-w-4xl mb-8">
           {t('project.visionDesc')}
         </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-white/5 hover:border-blue-400/30 transition-colors">
+            <h4 className="text-lg font-bold mb-2 text-blue-400">{t('project.whatTitle')}</h4>
+            <p className="text-sm text-foreground/80 leading-relaxed">{t('project.whatDesc')}</p>
+          </div>
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-white/5 hover:border-emerald-400/30 transition-colors">
+            <h4 className="text-lg font-bold mb-2 text-emerald-400">{t('project.howTitle')}</h4>
+            <p className="text-sm text-foreground/80 leading-relaxed">{t('project.howDesc')}</p>
+          </div>
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-white/5 hover:border-purple-400/30 transition-colors">
+            <h4 className="text-lg font-bold mb-2 text-purple-400">{t('project.whyTitle')}</h4>
+            <p className="text-sm text-foreground/80 leading-relaxed">{t('project.whyDesc')}</p>
+          </div>
+        </div>
       </section>
 
       {/* Architecture Section */}
