@@ -1,13 +1,21 @@
 {
   "xgboost": {
-    "accuracy": 0.9,
+    "accuracy": 0.8741,
     "status": "trained",
-    "n_estimators": 200
+    "n_estimators": 200,
+    "feature_importance": {
+      "session_count_7d": 0.1154734268784523,
+      "feature_breadth": 0.11187124997377396,
+      "avg_session_duration_min": 0.12294385582208633,
+      "days_since_last_use": 0.37599536776542664,
+      "engagement_score": 0.19131715595722198,
+      "plan_encoded": 0.08239895850419998
+    }
   },
   "kmeans": {
-    "silhouette": 0.4297,
+    "silhouette": 0.2758,
     "status": "trained",
     "n_clusters": 4
   },
-  "last_trained": "2026-05-04 23:39:17"
+  "last_trained": "2026-05-08 01:47:58"
 }

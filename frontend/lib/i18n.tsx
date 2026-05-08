@@ -162,6 +162,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'login.demo': 'Demo access: admin@acme.com / admin123',
     
     'ml.churnPred': 'Churn Probability per User',
+    'ml.featureImportance': 'Feature Importance (XGBoost)',
     
     'dec.suggestAI': 'Suggest with AI',
     'dash.reportGenerated': 'Report Generated',
@@ -278,6 +279,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'ml.driftWarning': 'Dérive Détectée',
     
     'ml.churnPred': 'Probabilité de Churn par Utilisateur',
+    'ml.featureImportance': 'Importance des variables (Feature Importance)',
     
     'dec.title': 'Configuration Moteur Décision',
     'dec.subtitle': 'Configurer les règles et déclencheurs.',

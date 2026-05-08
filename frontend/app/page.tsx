@@ -614,33 +614,67 @@ function MLView() {
         </div>
       </div>
 
-      <div className="glass-panel p-6">
-        <h3 className="font-semibold mb-6">{t('ml.churnPred')}</h3>
-        <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={churnScores.slice(0, 20)}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
-              <XAxis dataKey="user_id" tick={false} stroke="rgba(var(--foreground-rgb), 0.3)" />
-              <YAxis stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                itemStyle={{ color: '#fff' }}
-                formatter={(value: any) => new Intl.NumberFormat().format(value)}
-              />
-              <Bar 
-                dataKey="churn_score" 
-                fill="#ef4444" 
-                radius={[4, 4, 0, 0]} 
-                className="cursor-pointer"
-                onClick={(data: any) => {
-                  const query = lang === 'fr'
-                    ? `Analyse le score de churn pour l'utilisateur ${data.user_id}. Pourquoi est-il de ${(data.churn_score * 100).toFixed(1)}% ?`
-                    : `Analyze the churn score for user ${data.user_id}. Why is it ${(data.churn_score * 100).toFixed(1)}%?`;
-                  window.dispatchEvent(new CustomEvent('insightforge-query', { detail: query }));
-                }}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="glass-panel p-6">
+          <h3 className="font-semibold mb-6">{t('ml.churnPred')}</h3>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={churnScores.slice(0, 20)}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
+                <XAxis dataKey="user_id" tick={false} stroke="rgba(var(--foreground-rgb), 0.3)" />
+                <YAxis stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                  itemStyle={{ color: '#fff' }}
+                  formatter={(value: any) => new Intl.NumberFormat().format(value)}
+                />
+                <Bar 
+                  dataKey="churn_score" 
+                  fill="#ef4444" 
+                  radius={[4, 4, 0, 0]} 
+                  className="cursor-pointer"
+                  onClick={(data: any) => {
+                    const query = lang === 'fr'
+                      ? `Analyse le score de churn pour l'utilisateur ${data.user_id}. Pourquoi est-il de ${(data.churn_score * 100).toFixed(1)}% ?`
+                      : `Analyze the churn score for user ${data.user_id}. Why is it ${(data.churn_score * 100).toFixed(1)}%?`;
+                    window.dispatchEvent(new CustomEvent('insightforge-query', { detail: query }));
+                  }}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="glass-panel p-6">
+          <h3 className="font-semibold mb-6">{t('ml.featureImportance')}</h3>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart 
+                data={
+                  metrics?.xgboost?.feature_importance 
+                    ? Object.entries(metrics.xgboost.feature_importance)
+                        .map(([name, value]) => ({ 
+                          name: name.replace(/_/g, ' ').replace('min', '').trim(), 
+                          value: value as number 
+                        }))
+                        .sort((a, b) => b.value - a.value)
+                    : []
+                } 
+                layout="vertical"
+                margin={{ left: 30, right: 30 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" horizontal={false} />
+                <XAxis type="number" stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} />
+                <YAxis dataKey="name" type="category" stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} width={120} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                  itemStyle={{ color: '#fff' }}
+                  formatter={(value: any) => (value as number).toFixed(4)}
+                />
+                <Bar dataKey="value" fill="var(--primary)" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 

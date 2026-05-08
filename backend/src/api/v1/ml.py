@@ -44,11 +44,15 @@ def train_models(background_tasks: BackgroundTasks):
 
         # 2. Charger les données et entraîner
         df = load_features_from_db()
-        model, acc   = train_churn_model(df)
-        _, _, sil    = train_segmentation_model(df)
+        model, acc, feat_imp = train_churn_model(df)
+        _, _, sil            = train_segmentation_model(df)
 
         metrics = {
-            "xgboost": {"accuracy": round(acc, 4), "status": "trained"},
+            "xgboost": {
+                "accuracy": round(acc, 4), 
+                "status": "trained",
+                "feature_importance": feat_imp
+            },
             "kmeans":  {"silhouette": round(sil, 4), "status": "trained"},
             "last_trained": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }

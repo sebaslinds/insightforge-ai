@@ -56,14 +56,20 @@ def train_churn_model(df):
     print(f"  [OK] Accuracy : {acc:.4f}")
     print(classification_report(y_test, preds, target_names=["Retained", "Churned"]))
 
+    # Calculer l'importance des features
+    importance = model.feature_importances_
+    feature_names = X.columns.tolist()
+    feat_imp = {name: float(imp) for name, imp in zip(feature_names, importance)}
+
     joblib.dump(model, XGB_PATH)
     upload_model_to_gcs(str(XGB_PATH), "models/churn_model.pkl")
     print(f"  [SAVED] churn_model.pkl -> {XGB_PATH}")
-    return model, acc
+    return model, acc, feat_imp
 
 def train_segmentation_model(df):
     print("[KMEANS] Entrainement K-Means (Segmentation)...")
     X = df[FEATURE_COLS].copy()
+    X = X.fillna(0)
 
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
@@ -90,12 +96,17 @@ if __name__ == "__main__":
     df = load_features_from_db()
     print(f"  [OK] {len(df)} users charges.")
 
-    model, acc  = train_churn_model(df)
+    model, acc, feat_imp  = train_churn_model(df)
     kmeans, scaler, sil = train_segmentation_model(df)
 
     # Sauvegarder les metriques pour l'API
     metrics = {
-        "xgboost": {"accuracy": round(acc, 4), "status": "trained", "n_estimators": 200},
+        "xgboost": {
+            "accuracy": round(acc, 4), 
+            "status": "trained", 
+            "n_estimators": 200,
+            "feature_importance": feat_imp
+        },
         "kmeans":  {"silhouette": round(sil, 4), "status": "trained", "n_clusters": 4},
         "last_trained": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
