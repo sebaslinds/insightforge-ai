@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="InsightForge AI",
-    version="1.3.5",
+    version="1.3.8",
     description="Moteur de personnalisation IA multi-tenant pour SaaS",
     lifespan=lifespan,
 )
@@ -57,6 +57,16 @@ app.add_middleware(
 app.include_router(api_router)
 
 
+@app.get("/", tags=["System"])
+def root():
+    return {
+        "name": "InsightForge AI API",
+        "status": "active",
+        "version": "1.3.8",
+        "docs": "/docs"
+    }
+
+
 @app.get("/health", tags=["System"])
 def health():
-    return {"status": "ok", "env": settings.ENVIRONMENT, "version": "1.3.5"}
+    return {"status": "ok", "env": settings.ENVIRONMENT, "version": "1.3.8"}

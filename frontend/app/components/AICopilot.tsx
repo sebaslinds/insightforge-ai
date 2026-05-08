@@ -20,6 +20,13 @@ type Message = {
 function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
   const { theme } = useLanguage();
   const colors = THEME_COLORS[theme] || THEME_COLORS.midnight;
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    // Delay rendering to allow chat animation to finish and container to have dimensions
+    const timer = setTimeout(() => setShouldRender(true), 200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -40,15 +47,28 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
 
   try {
     const data = JSON.parse(jsonStr);
-    if (!data.type || !data.items) return null;
+    if (!data.type || !data.items || !Array.isArray(data.items) || data.items.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center h-[160px] text-foreground/40 text-xs gap-2">
+          <BarChartIcon size={24} className="opacity-20" />
+          <span>Données de visualisation non disponibles</span>
+        </div>
+      );
+    }
 
-    const chartHeight = 160;
+    if (!shouldRender) {
+      return <div className="h-[160px] w-full flex items-center justify-center"><Loader2 className="animate-spin text-primary/40" /></div>;
+    }
 
     if (data.type === 'area') {
+      const processedData = data.items.map((item: any) => ({
+        ...item,
+        value: Number(item.value)
+      }));
       return (
-        <div className="h-[160px] w-full relative">
-          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-            <AreaChart data={data.items} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+        <div className="h-[160px] w-[260px] mx-auto relative">
+          <ResponsiveContainer width="100%" height="100%" key={jsonStr}>
+            <AreaChart data={processedData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="chatColor" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={colors.primary} stopOpacity={0.3}/>
@@ -67,17 +87,22 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
     }
 
     if (data.type === 'pie') {
-      const PIE_COLORS = [colors.primary, colors.secondary, '#f59e0b', '#ef4444', '#10b981'];
+      const PIE_COLORS = [colors.primary || '#3b82f6', colors.secondary || '#10b981', '#f59e0b', '#ef4444', '#10b981'];
+      const processedData = data.items.map((item: any) => ({
+        ...item,
+        value: Number(item.value)
+      }));
+      
       return (
-        <div className="h-[160px] w-full relative">
-          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+        <div className="h-[160px] w-[260px] mx-auto relative">
+          <ResponsiveContainer width="100%" height="100%" key={jsonStr}>
             <PieChart>
               <Pie
-                data={data.items}
-                cx="50%" cy="50%" innerRadius={35} outerRadius={50}
+                data={processedData}
+                cx="50%" cy="50%" innerRadius={40} outerRadius={60}
                 paddingAngle={5} dataKey="value" stroke="none"
               >
-                {data.items.map((_: any, index: number) => (
+                {processedData.map((_: any, index: number) => (
                   <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                 ))}
               </Pie>
@@ -89,10 +114,14 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
     }
 
     if (data.type === 'bar') {
+      const processedData = data.items.map((item: any) => ({
+        ...item,
+        value: Number(item.value)
+      }));
       return (
-        <div className="h-[160px] w-full relative">
-          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-            <BarChart data={data.items} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+        <div className="h-[160px] w-[260px] mx-auto relative">
+          <ResponsiveContainer width="100%" height="100%" key={jsonStr}>
+            <BarChart data={processedData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} />
               <YAxis hide />

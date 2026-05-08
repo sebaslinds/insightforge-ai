@@ -18,3 +18,5 @@ out/
 
 # Database
 *.sqlite3
+# Model Logs
+brain/

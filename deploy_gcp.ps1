@@ -46,7 +46,7 @@ if ($service -eq "all" -or $service -eq "backend") {
         --platform managed --region $REGION --allow-unauthenticated `
         --add-cloudsql-instances "${PROJECT_ID}:${REGION}:insightforge-db" `
         --service-account "insightforge-app-sa@${PROJECT_ID}.iam.gserviceaccount.com" `
-        --set-env-vars "ENVIRONMENT=production,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GCS_BUCKET=insightforge-assets-${PROJECT_ID},CLOUD_SQL_CONNECTION_NAME=${PROJECT_ID}:${REGION}:insightforge-db,DB_USER=postgres,DB_PASS=ForgeAI2026,DB_NAME=insightforge,OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE"
+        --set-env-vars "ENVIRONMENT=production,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GCS_BUCKET=insightforge-assets-${PROJECT_ID},CLOUD_SQL_CONNECTION_NAME=${PROJECT_ID}:${REGION}:insightforge-db,DB_USER=postgres,DB_PASS=ForgeAI2026,DB_NAME=insightforge,OPENAI_API_KEY=PLACEHOLDER_KEY"
 }
 
 if ($service -eq "all" -or $service -eq "frontend") {

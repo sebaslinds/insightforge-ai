@@ -43,7 +43,7 @@ function KPICard({ title, value, icon: Icon, trend, color, t, granularity, detai
         <div className="flip-card-front glass-panel p-4 flex flex-col justify-between group-hover/card:border-primary/50 transition-all overflow-hidden absolute w-full h-full backface-hidden">
           <div className="flex justify-between items-start">
             <div className="flex-1 min-w-0 pr-2">
-              <p className="text-[10px] uppercase font-bold text-foreground/40 tracking-widest mb-1 truncate" title={title}>
+              <p className="text-[10px] uppercase font-bold text-foreground/40 tracking-widest mb-1 whitespace-normal break-words" title={title}>
                 {title}
               </p>
               <h3 className="text-xl font-black text-foreground tracking-tight whitespace-nowrap">

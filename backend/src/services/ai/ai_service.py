@@ -9,17 +9,19 @@ def generate_sql(question: str) -> str:
     q = question.lower()
     if "plan" in q or "répartition" in q or "distribution" in q or "conversion" in q or "taux" in q:
         return "SELECT plan, COUNT(*) as users FROM users GROUP BY plan ORDER BY users DESC"
+    if "cohort" in q or "cohorte" in q or "semaine" in q or "week" in q:
+        return "SELECT plan, segment, COUNT(*) as user_count FROM users GROUP BY plan, segment"
     if "user" in q or "utilisateur" in q or "combien" in q:
-        return "SELECT plan, segment, COUNT(*) as count FROM users GROUP BY plan, segment"
+        return "SELECT plan, segment, COUNT(*) as user_count, AVG(engagement_score) as avg_engagement FROM users GROUP BY plan, segment"
     if "churn" in q or "churned" in q:
-        return "SELECT user_id, engagement_score, days_since_last_use FROM users WHERE churned = true LIMIT 20"
+        return "SELECT plan, segment, COUNT(*) as churned_users, AVG(engagement_score) as avg_score_at_churn FROM users WHERE churned = true GROUP BY plan, segment"
     if "segment" in q or "profil" in q:
-        return "SELECT plan, COUNT(*) as count, AVG(engagement_score) as avg_score FROM users GROUP BY plan"
+        return "SELECT segment, COUNT(*) as count, AVG(engagement_score) as avg_score, AVG(days_since_last_use) as avg_recency FROM users GROUP BY segment"
     if "event" in q or "événement" in q or "evenement" in q:
-        return "SELECT event_type, COUNT(*) as count FROM events GROUP BY event_type ORDER BY count DESC LIMIT 10"
+        return "SELECT event_type, COUNT(*) as total_events, COUNT(DISTINCT user_id) as unique_users FROM events GROUP BY event_type ORDER BY total_events DESC LIMIT 10"
     if "revenue" in q or "revenu" in q:
-        return "SELECT plan, COUNT(*) as users, SUM(engagement_score) as total_score FROM users GROUP BY plan"
-    return "SELECT user_id, plan, engagement_score, days_since_last_use FROM users ORDER BY engagement_score DESC LIMIT 20"
+        return "SELECT plan, COUNT(*) as users, SUM(CASE WHEN plan = 'Enterprise' THEN 499 WHEN plan = 'Pro' THEN 49 ELSE 0 END) as revenue_usd FROM users GROUP BY plan"
+    return "SELECT user_id, plan, segment, engagement_score, days_since_last_use FROM users ORDER BY engagement_score DESC LIMIT 50"
 
 
 # ── GPT-4o Insight Generation ─────────────────────────────────────────────────
@@ -49,29 +51,36 @@ async def generate_insight(payload: dict, language: str = "en") -> str:
         }
 
         system_prompt = (
-            "Tu es un analyste SaaS expert en rétention client et en ML. "
-            "Analyse les données fournies et donne une réponse concise, chiffrée et actionnable en français. "
-            "IMPORTANT: Utilise les chiffres du 'data_summary' (qui contient les totaux et distributions réels de la BD) pour tes calculs et tes tableaux. "
-            "Ne te base pas sur un échantillon partiel. Si le résumé dit 'Total records: 6272', utilise ce chiffre.\n\n"
+            "Tu es un analyste SaaS expert en stratégie de revenus et rétention. "
+            "Analyse les données fournies et donne une réponse concise, chiffrée et ultra-visuelle en français. "
+            "IMPORTANT: \n"
+            "1. Utilise TOUJOURS les chiffres du 'data_summary' (6000+ users). Sois précis.\n"
+            "2. Inclus SYSTEMATIQUEMENT un graphique Recharts via un bloc JSON si les données s'y prêtent.\n"
+            "   - 'pie' pour la répartition par plan ou segment.\n"
+            "   - 'bar' pour comparer des moyennes ou des comptes.\n"
+            "   - 'area' pour les séries temporelles ou distributions.\n"
+            "3. Assure la COHERENCE : si on te pose une question sur une cohorte spécifique (ex: W18), utilise les chiffres du 'data_summary' pour estimer la répartition proportionnellement à la taille de la cohorte indiquée dans la question.\n"
+            "4. Ne confonds jamais les POURCENTAGES et les COMPTES ABSOLUS (ex: 19% de 100 users = 19 users, pas 19% users).\n"
+            "5. CONCISION & FINITION : Sois bref (max 150 mots). Termine TOUJOURS tes phrases. Ne laisse jamais un point suspendu.\n"
+            "6. Explique l'impact business court (ex: pourquoi le churn est élevé).\n\n"
             f"Définitions des variables ML :\n{FEATURE_DEFS}\n\n"
-            "L'importance des variables (feature_importance) est calculée par le modèle XGBoost via le gain d'information : "
-            "plus une variable aide à réduire l'incertitude sur la prédiction du churn, plus son importance est élevée.\n\n"
-            "Utilise le Markdown : tableaux pour les chiffres, listes à puces pour les points clés. "
-            "Inclus impérativement un bloc JSON à la fin pour un graphique Recharts si pertinent :\n"
+            "Format JSON obligatoire pour les graphiques :\n"
             "```json\n"
             "{\"type\": \"area\" | \"pie\" | \"bar\", \"items\": [{\"name\": \"label\", \"value\": 123}, ...]}\n"
             "```"
             if language == "fr"
             else
-            "You are a SaaS analyst expert in customer retention and ML. "
-            "Analyze the provided data and give a concise, quantified, and actionable response in English. "
-            "IMPORTANT: Use the numbers from 'data_summary' (real DB totals and distributions) for your calculations. "
-            "Do not use a partial sample. If the summary says 'Total records: 6272', use that figure.\n\n"
+            "You are a SaaS analyst expert in revenue strategy and retention. "
+            "Analyze the provided data and give a concise, quantified, and ultra-visual response in English. "
+            "IMPORTANT: \n"
+            "1. ALWAYS use the figures from 'data_summary' (6000+ users). Be precise.\n"
+            "2. SYSTEMATICALLY include a Recharts graph via a JSON block if the data allows.\n"
+            "3. Ensure CONSISTENCY: if asked about a specific cohort (e.g., W18), use the 'data_summary' figures to estimate the breakdown proportionally to the cohort size mentioned in the question.\n"
+            "4. Never confuse PERCENTAGES and ABSOLUTE COUNTS (e.g., 19% of 100 users = 19 users, not 19% users).\n"
+            "5. CONCISENESS & COMPLETION: Be brief (max 150 words). ALWAYS complete your sentences. Never leave a point hanging.\n"
+            "6. Explain short business impact (e.g., why churn is high).\n\n"
             f"ML Feature Definitions:\n{FEATURE_DEFS}\n\n"
-            "Feature importance is calculated by the XGBoost model via information gain: "
-            "the more a variable helps reduce uncertainty in churn prediction, the higher its importance.\n\n"
-            "Use Markdown: tables for numbers, bullet points for key takeaways. "
-            "Always include a JSON block at the end for a Recharts graph if relevant:\n"
+            "Mandatory JSON format for charts:\n"
             "```json\n"
             "{\"type\": \"area\" | \"pie\" | \"bar\", \"items\": [{\"name\": \"label\", \"value\": 123}, ...]}\n"
             "```"
@@ -87,7 +96,7 @@ async def generate_insight(payload: dict, language: str = "en") -> str:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content},
             ],
-            max_tokens=300,
+            max_tokens=800,
             temperature=0.4,
         )
         return response.choices[0].message.content

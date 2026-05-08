@@ -1,6 +1,6 @@
 # 🚀 InsightForge AI
 
-**[🔗 Access Live Application (Demo)](https://frontend-gqaawjux7q-nn.a.run.app)**
+**[🔗 Access Live Application (Demo)](https://frontend-458613429367.northamerica-northeast1.run.app)** | **[📖 User Guide (Documentation)](file:///C:/Users/slind/.gemini/antigravity/brain/fa6aa248-63b7-4d1a-97e6-cd2eefc0c232/user_guide.md)**
 *(Use credentials: admin@acme.com / admin123)*
 
 **InsightForge AI** is a multi-tenant B2B SaaS platform that acts as a plug-and-play AI personalization engine for other SaaS companies. It transforms raw behavioral data into actionable insights, predicting churn and segmenting users in real-time, enabling Product and Customer Success teams to trigger the right messages at the right time.
@@ -20,12 +20,12 @@
 6. **AI Copilot** 🤖
    - Generative AI assistant powered by **OpenAI GPT-4o** with dynamic Text-to-SQL capabilities, allowing executives to chat directly with their SaaS data.
 
-## ✨ Latest Features (v1.3.5)
+## ✨ Latest Features (v1.3.8)
 
-- **Interactive AI Charts** 📊: Click on any bar in the ML Models view to trigger an automated, deep-dive analysis in the AI Copilot.
+- **Stabilized AI Copilot** 🤖: Enhanced response precision using global data summaries and strict conciseness constraints (max 150 words).
+- **Interactive AI Charts** 📊: Click on any bar or retention cell to trigger an automated, deep-dive analysis with stable Recharts visualizations.
+- **Improved UX & Readability** 📑: Full visibility for all KPI titles (no truncation) and systematic completion of AI sentences.
 - **High-Precision Data Summary** 📈: The AI Copilot now utilizes real-time statistical aggregates from the entire PostgreSQL dataset (6,000+ users), ensuring accurate counts and distributions in chat responses.
-- **Explainable AI (XAI)** 💡: GPT-4o now provides detailed definitions for ML features and explains reasoning based on XGBoost information gain.
-- **McKinsey-Style UI** 🏢: High-density, professional executive dashboard with optimized data visualizations and glassmorphism aesthetics.
 
 ## 🧠 Tech Stack
 
