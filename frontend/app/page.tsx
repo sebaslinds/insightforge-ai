@@ -202,9 +202,9 @@ function DashboardView() {
              <div className="lg:col-span-1 glass-panel p-4 flex flex-col h-64">
                 <div className="flex items-center justify-between mb-4">
                    <h3 className="text-xs font-bold uppercase text-foreground/40 tracking-widest flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-success animate-pulse" /> Live Activity
+                      <div className="w-2 h-2 rounded-full bg-success animate-pulse" /> {t('dash.liveActivity')}
                    </h3>
-                   <span className="text-[10px] font-mono text-success">REALTIME</span>
+                   <span className="text-[10px] font-mono text-success">{t('dash.realtime')}</span>
                 </div>
                 <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-2">
                    {[
@@ -232,7 +232,7 @@ function DashboardView() {
                    <div className="flex justify-between items-start">
                       <div className="group relative">
                         <p className="text-[10px] uppercase font-bold text-foreground/40 tracking-widest mb-1 flex items-center gap-1">
-                          XGBoost Accuracy
+                          {t('ml.accuracy')}
                           <Info size={10} className="cursor-help text-foreground/20 group-hover:text-primary transition-colors" />
                         </p>
                         <div className="absolute top-full left-0 mt-2 w-48 p-2 bg-popover text-[10px] text-popover-foreground rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 normal-case font-normal border border-card-border backdrop-blur-xl shadow-xl">
@@ -244,8 +244,8 @@ function DashboardView() {
                    </div>
                    <div className="space-y-2">
                       <div className="flex justify-between text-[10px] font-bold">
-                         <span className="text-foreground/40 uppercase">Model Health</span>
-                         <span className="text-success">EXCELLENT</span>
+                         <span className="text-foreground/40 uppercase">{t('ml.modelHealth')}</span>
+                         <span className="text-success">{t('ml.excellent')}</span>
                       </div>
                       <div className="w-full bg-foreground/5 h-1.5 rounded-full overflow-hidden">
                          <div className="bg-primary h-full w-[75.5%] animate-pulse" />
@@ -268,7 +268,7 @@ function DashboardView() {
                    </div>
                    <div className="space-y-2">
                       <div className="flex justify-between text-[10px] font-bold">
-                         <span className="text-foreground/40 uppercase">W1 Trend</span>
+                         <span className="text-foreground/40 uppercase">{t('ret.w1Trend')}</span>
                          <span className="text-success">↑ 4.2%</span>
                       </div>
                       <div className="flex gap-1 h-8 items-end">
@@ -411,7 +411,7 @@ function DashboardView() {
             <div className="glass-panel p-6">
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold">Conversion Rate (%)</h3>
+                  <h3 className="font-semibold">{t('dash.conversionRate')}</h3>
                   <div className="group relative">
                     <Info className="w-4 h-4 text-foreground/40 cursor-help" />
                     <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 p-2 text-xs bg-background text-foreground rounded border border-card-border z-10 text-center shadow-lg">
@@ -488,12 +488,9 @@ function SegmentsView() {
         {segments.map((seg, idx) => (
           <div key={seg?.name || idx} className="glass-panel p-6 border-l-4 flex flex-col justify-between" style={{ borderLeftColor: SEGMENT_COLORS[seg?.name] || colors.primary }}>
             <div>
-              <p className="text-xs font-bold text-foreground/40 mb-1 uppercase tracking-wider">{(seg?.name || 'Unknown').replace('_', ' ')}</p>
-              <h3 className="text-3xl font-bold text-foreground mb-2">{seg?.count || 0}</h3>
-              <p className="text-[11px] text-foreground/60 leading-relaxed min-h-[2.5rem]">
-                {t(`seg.desc.${seg?.name}`)}
-              </p>
-            </div>
+          <h1 className="text-3xl font-bold mb-2">{t('seg.title')}</h1>
+          <p className="text-foreground/60">{t('seg.subtitle')}</p>
+        </div>
             <div className="mt-4 pt-4 border-t border-card-border flex items-center justify-between">
               <span className="text-[10px] text-foreground/40 uppercase font-bold tracking-tighter">Distribution</span>
               <span className="text-xs font-mono text-primary">{(seg?.percentage || 0).toFixed(1)}%</span>
@@ -545,7 +542,7 @@ function SegmentsView() {
                 <td className="p-4">{(seg?.avg_churn_days || 0).toFixed(1)} days</td>
                 <td className="p-4">
                   <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${(seg?.avg_score || 0) > 70 ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
-                    {(seg?.avg_score || 0) > 70 ? 'Healthy' : 'Monitor'}
+                    {(seg?.avg_score || 0) > 70 ? t('ml.healthy') : t('ml.monitor')}
                   </span>
                 </td>
               </tr>
@@ -604,10 +601,10 @@ function MLView() {
           </div>
         </div>
         <div className="glass-panel p-6">
-          <p className="text-sm font-medium text-foreground/60 mb-1">K-Means Silhouette</p>
-          <h3 className="text-2xl font-bold text-foreground">{(metrics?.kmeans?.silhouette || 0).toFixed(3)}</h3>
-          <p className="text-[10px] text-foreground/40 mt-1 leading-tight">{t('ml.silhouetteDesc')}</p>
-        </div>
+           <p className="text-sm font-medium text-foreground/60 mb-1">{t('ml.silhouette')}</p>
+           <h3 className="text-2xl font-bold text-foreground">{(metrics?.kmeans?.silhouette || 0).toFixed(3)}</h3>
+           <p className="text-[10px] text-foreground/40 mt-1 leading-tight">{t('ml.silhouetteDesc')}</p>
+         </div>
         <div className="glass-panel p-6">
           <p className="text-sm font-medium text-foreground/60 mb-1">Last Trained</p>
           <h3 className="text-lg font-bold text-foreground">{metrics?.last_trained || "Just now"}</h3>
@@ -1551,7 +1548,7 @@ function AppContent({ onLogout }: { onLogout: () => void }) {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         <header className="h-16 flex items-center justify-between px-8 border-b border-card-border bg-background/50 backdrop-blur-md z-10 shrink-0">
           <div className="flex items-center gap-4">
-             <h2 className="text-foreground/40 text-xs font-bold uppercase tracking-widest">{currentView}</h2>
+             <h2 className="text-foreground/40 text-xs font-bold uppercase tracking-widest">{t('nav.' + currentView)}</h2>
           </div>
           <div className="flex items-center gap-6">
             <NotificationBell />

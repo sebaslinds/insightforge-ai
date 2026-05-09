@@ -275,7 +275,7 @@ export default function AICopilot() {
                       <AlertTriangle size={14} className="mt-0.5 shrink-0" />
                       <div className="flex-1">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="font-semibold capitalize">{dec.type}:</span>
+                          <span className="font-semibold capitalize">{t('dec.' + dec.type)}:</span>
                           {dec.confidence && (
                             <div className="flex items-center gap-1 text-[10px] font-bold text-white/40">
                               <Target size={10} /> {(dec.confidence * 100).toFixed(0)}%
@@ -303,7 +303,7 @@ export default function AICopilot() {
                   {msg.executionResults.map((res, idx) => (
                     <div key={idx} className="flex items-center space-x-2 text-xs text-success">
                       <CheckCircle size={12} />
-                      <span>{res.action.replace('_', ' ')} - <span className="uppercase font-semibold">{res.status}</span></span>
+                      <span>{res.action.replace('_', ' ')} - <span className="uppercase font-semibold">{t('dec.' + res.status.toLowerCase())}</span></span>
                     </div>
                   ))}
                 </div>
