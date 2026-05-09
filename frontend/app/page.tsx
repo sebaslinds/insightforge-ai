@@ -318,12 +318,11 @@ function DashboardView() {
                         <stop offset="95%" stopColor={colors.primary} stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.2)" vertical={false} />
-                    <XAxis dataKey="name" stroke="var(--foreground)" strokeWidth={1} tick={{fill: 'var(--foreground)', fontSize: 10, fontWeight: 600}} axisLine={true} tickLine={true} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
+                    <XAxis dataKey="name" stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 10}} axisLine={false} tickLine={false} />
                     <YAxis 
-                      stroke="var(--foreground)" 
-                      strokeWidth={1}
-                      tick={{fill: 'var(--foreground)', fontSize: 10, fontWeight: 600}} 
+                      stroke="rgba(var(--foreground-rgb), 0.3)" 
+                      tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 10}} 
                       axisLine={false} 
                       tickLine={false}
                       tickFormatter={(val) => new Intl.NumberFormat().format(val)}
@@ -427,9 +426,9 @@ function DashboardView() {
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={conversions?.history || []}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.2)" vertical={false} />
-                    <XAxis dataKey="month" stroke="var(--foreground)" strokeWidth={1} tick={{fill: 'var(--foreground)', fontSize: 10, fontWeight: 600}} />
-                    <YAxis stroke="var(--foreground)" strokeWidth={1} tick={{fill: 'var(--foreground)', fontSize: 10, fontWeight: 600}} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
+                    <XAxis dataKey="month" stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 10}} />
+                    <YAxis stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 10}} />
                     <Tooltip 
                       contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--card-border)', borderRadius: '8px' }}
                       itemStyle={{ color: 'var(--foreground)' }}
@@ -625,9 +624,9 @@ function MLView() {
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={churnScores.slice(0, 20)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.2)" vertical={false} />
-                <XAxis dataKey="user_id" tick={false} stroke="var(--foreground)" strokeWidth={1} />
-                <YAxis stroke="var(--foreground)" strokeWidth={1} tick={{fill: 'var(--foreground)', fontSize: 10, fontWeight: 600}} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
+                <XAxis dataKey="user_id" tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 8}} stroke="rgba(var(--foreground-rgb), 0.3)" interval="preserveStartEnd" />
+                <YAxis stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 10}} width={30} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--card-border)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
                   itemStyle={{ color: 'var(--foreground)' }}
@@ -674,9 +673,9 @@ function MLView() {
                 } 
                 layout="vertical"
                 margin={{ left: 30, right: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.2)" horizontal={false} />
-                <XAxis type="number" stroke="var(--foreground)" strokeWidth={1} tick={{fill: 'var(--foreground)', fontSize: 10, fontWeight: 600}} />
-                <YAxis dataKey="name" type="category" stroke="var(--foreground)" strokeWidth={1} tick={{fill: 'var(--foreground)', fontSize: 10, fontWeight: 600}} width={120} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" horizontal={false} />
+                <XAxis type="number" stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 10}} />
+                <YAxis dataKey="name" type="category" stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 10}} width={100} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--card-border)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
                   itemStyle={{ color: 'var(--foreground)' }}
