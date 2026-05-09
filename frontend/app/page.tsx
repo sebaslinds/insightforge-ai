@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Activity, TrendingUp, Users, AlertTriangle, Settings, Brain, Network, RefreshCw, Loader2, Globe, Info, FileText, Sparkles, Plus, Trash2, Download, Book, Lock, Mail, Key, LogOut, Bell, Check, ThumbsUp, ThumbsDown, Filter, ChevronDown, Server, Cloud, Database, DatabaseZap } from "lucide-react";
+import { Activity, TrendingUp, Users, AlertTriangle, Settings, Brain, Network, RefreshCw, Loader2, Globe, Info, FileText, Sparkles, Plus, Trash2, Download, Book, Lock, Mail, Key, LogOut, Bell, Check, ThumbsUp, ThumbsDown, Filter, ChevronDown, Server, Cloud, Database, DatabaseZap, Target } from "lucide-react";
 import AICopilot from "./components/AICopilot";
 import Sidebar from "./components/Sidebar";
 import Modal from "./components/Modal";
@@ -182,20 +182,19 @@ function DashboardView() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 shrink-0">
-            {!summary ? (
-              <>
-                <KPISkeleton /> <KPISkeleton /> <KPISkeleton /> <KPISkeleton />
-              </>
-            ) : (
-              <>
-                <KPICard title={t('dash.revenue')} value={summary?.total_revenue || "—"} icon={TrendingUp} trend={+12.5} color="success" t={t} granularity={granularity} details={summary?.revenue_breakdown} lang={lang} />
-                <KPICard title={t('dash.users')} value={summary?.active_users || "—"} icon={Users} trend={+5.2} color="primary" t={t} granularity={granularity} lang={lang} />
-                <KPICard title={t('dash.engagement')} value={summary?.engagement_score || "—"} icon={Activity} trend={+1.2} color="secondary" t={t} granularity={granularity} lang={lang} />
-                <KPICard title={t('dash.churn')} value={summary?.churn_rate || "—"} icon={AlertTriangle} trend={-2.4} color="danger" t={t} granularity={granularity} lang={lang} />
-              </>
-            )}
-          </div>
+          {!summary ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 shrink-0">
+              <KPISkeleton /> <KPISkeleton /> <KPISkeleton /> <KPISkeleton /> <KPISkeleton />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8 shrink-0">
+              <KPICard title={t('dash.revenue')} value={summary?.total_revenue || "—"} icon={TrendingUp} trend={+12.5} color="success" t={t} granularity={granularity} details={summary?.revenue_breakdown} lang={lang} />
+              <KPICard title={t('dash.users')} value={summary?.active_users || "—"} icon={Users} trend={+5.2} color="primary" t={t} granularity={granularity} lang={lang} />
+              <KPICard title={t('dash.engagement')} value={summary?.engagement_score || "—"} icon={Activity} trend={+1.2} color="secondary" t={t} granularity={granularity} lang={lang} />
+              <KPICard title={t('dash.churn')} value={summary?.churn_rate || "—"} icon={AlertTriangle} trend={-2.4} color="danger" t={t} granularity={granularity} lang={lang} />
+              <KPICard title={t('dash.cac')} value={summary?.avg_cac || "—"} icon={Target} trend={-4.8} color="warning" t={t} granularity={granularity} lang={lang} />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 shrink-0">
              {/* Live Events Feed */}

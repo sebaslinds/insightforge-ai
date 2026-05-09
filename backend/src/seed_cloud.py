@@ -62,7 +62,21 @@ def seed_cloud():
                 profile = random.choice(segments)
                 # Date d'inscription précise dans la semaine
                 signup_date = cohort_date + timedelta(days=random.randint(0, 6))
-                
+
+                # Acquisition simulation
+                channels = {
+                    "google_ads": random.uniform(80, 150),
+                    "linkedin": random.uniform(120, 250),
+                    "organic": 0.0,
+                    "referral": random.uniform(10, 40),
+                    "twitter": random.uniform(40, 90)
+                }
+                channel = random.choices(
+                    list(channels.keys()), 
+                    weights=[0.3, 0.2, 0.35, 0.1, 0.05] # Probability of each channel
+                )[0]
+                cost = channels[channel]
+
                 user = User(
                     user_id=str(uuid.uuid4()),
                     tenant_id=tenant.id,
@@ -70,7 +84,9 @@ def seed_cloud():
                     plan=random.choice(plans),
                     segment=profile,
                     engagement_score=random.uniform(40, 95) if profile != "dormant" else random.uniform(5, 20),
-                    churn_score=random.uniform(0, 0.3) if profile == "power_user" else random.uniform(0.7, 0.95)
+                    churn_score=random.uniform(0, 0.3) if profile == "power_user" else random.uniform(0.7, 0.95),
+                    acquisition_channel=channel,
+                    acquisition_cost=cost
                 )
                 db.add(user)
                 

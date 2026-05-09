@@ -39,6 +39,9 @@ def get_summary(granularity: str = Query("month"), current_user: AdminUser = Dep
         avg_engagement = df['engagement_score'].mean()
         churn_rate = (df['churned'].sum() / active_users * 100)
         
+        # Acquisition cost (CAC)
+        avg_cac = sum([u.acquisition_cost for u in users if u.acquisition_cost is not None]) / active_users if active_users > 0 else 0
+        
         # Calcul du breakdown pour le détail de la carte
         breakdown = {}
         for plan, price in plan_prices.items():
@@ -51,6 +54,7 @@ def get_summary(granularity: str = Query("month"), current_user: AdminUser = Dep
             "active_users": f"{active_users:,}",
             "engagement_score": f"{avg_engagement:.1f}/100",
             "churn_rate": f"{churn_rate:.1f}%",
+            "avg_cac": f"${avg_cac:,.1f}",
             "revenue_breakdown": breakdown
         }
     except Exception as e:

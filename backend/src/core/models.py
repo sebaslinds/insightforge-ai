@@ -27,6 +27,10 @@ class User(Base):
     churn_score  = Column(Float, nullable=True)
     churned      = Column(Boolean, default=False)
 
+    # Acquisition
+    acquisition_cost    = Column(Float, default=0.0)
+    acquisition_channel = Column(String, nullable=True) # google_ads / linkedin / organic / etc.
+
     events = relationship("Event", back_populates="user")
 
 class Event(Base):

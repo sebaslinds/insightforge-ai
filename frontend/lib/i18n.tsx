@@ -246,6 +246,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'dec.triggered': 'TRIGGERED',
     'dash.conversionRate': 'Conversion Rate (%)',
     'ret.avgRetention': 'Average Retention',
+    'dash.cac': 'Avg. CAC',
+    'dash.cacDesc': 'Average cost spent to acquire a single customer across all paid channels.',
   },
   fr: {
     'nav.dashboard': 'Tableau de bord',
@@ -471,6 +473,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'dec.triggered': 'DÉCLENCHÉ',
     'dash.conversionRate': 'Taux de conversion (%)',
     'ret.avgRetention': 'Rétention Moyenne',
+    'dash.cac': 'CAC Moyen',
+    'dash.cacDesc': 'Coût moyen dépensé pour acquérir un client sur l\'ensemble des canaux payants.',
   }
 };
 
