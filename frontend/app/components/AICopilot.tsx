@@ -75,8 +75,8 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
                   <stop offset="95%" stopColor={colors.primary} stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.15)" vertical={false} />
-              <XAxis dataKey="name" stroke="rgba(var(--foreground-rgb), 0.4)" fontSize={10} tickLine={false} axisLine={false} tick={{fill: 'rgba(var(--foreground-rgb), 0.7)'}} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.2)" vertical={false} />
+              <XAxis dataKey="name" stroke="var(--foreground)" fontSize={10} tickLine={true} axisLine={true} tick={{fill: 'var(--foreground)', fontWeight: 600}} />
               <YAxis hide />
               <Tooltip content={<CustomTooltip />} />
               <Area type="monotone" dataKey="value" stroke={colors.primary} strokeWidth={2} fillOpacity={1} fill="url(#chatColor)" />
@@ -122,8 +122,8 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
         <div className="h-[160px] w-[260px] mx-auto relative">
           <ResponsiveContainer width="100%" height="100%" key={jsonStr}>
             <BarChart data={processedData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.15)" vertical={false} />
-              <XAxis dataKey="name" stroke="rgba(var(--foreground-rgb), 0.4)" fontSize={10} tickLine={false} axisLine={false} tick={{fill: 'rgba(var(--foreground-rgb), 0.7)'}} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.2)" vertical={false} />
+              <XAxis dataKey="name" stroke="var(--foreground)" fontSize={10} tickLine={true} axisLine={true} tick={{fill: 'var(--foreground)', fontWeight: 600}} />
               <YAxis hide />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="value" fill={colors.primary} radius={[4, 4, 0, 0]} />
