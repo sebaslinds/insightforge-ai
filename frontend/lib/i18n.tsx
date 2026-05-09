@@ -245,6 +245,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'dec.logged': 'LOGGED',
     'dec.triggered': 'TRIGGERED',
     'dash.conversionRate': 'Conversion Rate (%)',
+    'ret.avgRetention': 'Average Retention',
   },
   fr: {
     'nav.dashboard': 'Tableau de bord',
@@ -469,6 +470,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'dec.logged': 'ENREGISTRÉ',
     'dec.triggered': 'DÉCLENCHÉ',
     'dash.conversionRate': 'Taux de conversion (%)',
+    'ret.avgRetention': 'Rétention Moyenne',
   }
 };
 

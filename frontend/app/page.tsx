@@ -256,7 +256,7 @@ function DashboardView() {
                    <div className="flex justify-between items-start">
                       <div className="group relative">
                         <p className="text-[10px] uppercase font-bold text-foreground/40 tracking-widest mb-1 flex items-center gap-1">
-                          Average Retention
+                          {t('ret.avgRetention')}
                           <Info size={10} className="cursor-help text-foreground/20 group-hover:text-primary transition-colors" />
                         </p>
                         <div className="absolute top-full left-0 mt-2 w-48 p-2 bg-popover text-[10px] text-popover-foreground rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 normal-case font-normal border border-card-border backdrop-blur-xl shadow-xl">
