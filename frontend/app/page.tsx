@@ -214,13 +214,13 @@ function DashboardView() {
                       { user: 'usr_112', event: 'Feature: Copilot', time: '3m ago', color: 'primary' },
                       { user: 'usr_665', event: 'Feature: Export', time: '5m ago', color: 'primary' },
                    ].map((log, i) => (
-                      <div key={i} className="w-full flex items-center justify-between transition-all p-3 rounded-xl text-foreground/80 hover:text-primary hover:bg-primary/10 hover:scale-105 border border-card-border transition-colors">
+                      <div key={i} className="flex items-center justify-between text-[11px] p-2 rounded-lg bg-foreground/5 border border-card-border hover:border-primary/30 transition-colors">
                          <div className="flex items-center gap-2">
                             <div className={`w-1.5 h-1.5 rounded-full bg-${log.color}`} />
                             <span className="font-bold text-foreground/80">{log.user}</span>
                             <span className="text-foreground/40">{log.event}</span>
                          </div>
-                         <span className="text-[9px] opacity-60">{log.time}</span>
+                         <span className="text-[9px] opacity-30">{log.time}</span>
                       </div>
                    ))}
                 </div>
@@ -886,7 +886,7 @@ function DecisionEngineView() {
         ) : (
           <div className="space-y-4">
             {rules.map((rule) => (
-              <div key={rule.id} className="p-6 bg-foreground/5 border border-card-border rounded-2xl flex items-center justify-between group hover:border-primary/50 transition-all">
+              <div key={rule.id} className="p-6 bg-foreground/5 border border-card-border rounded-2xl flex items-center justify-between group">
                 <div className="flex-1 pr-8">
                   <h4 className="text-foreground font-bold mb-1 text-lg">{rule.name}</h4>
                   <p className="text-foreground/60 text-sm leading-relaxed">{rule.description}</p>
@@ -945,19 +945,19 @@ function ProjectView() {
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border hover:border-amber-400/30 transition-colors">
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border">
             <h4 className="text-lg font-bold mb-2 text-amber-400">{t('project.saasTitle')}</h4>
             <p className="text-sm text-foreground/80 leading-relaxed">{t('project.saasDesc')}</p>
           </div>
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border hover:border-blue-400/30 transition-colors">
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border">
             <h4 className="text-lg font-bold mb-2 text-blue-400">{t('project.whatTitle')}</h4>
             <p className="text-sm text-foreground/80 leading-relaxed">{t('project.whatDesc')}</p>
           </div>
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border hover:border-emerald-400/30 transition-colors">
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border">
             <h4 className="text-lg font-bold mb-2 text-emerald-400">{t('project.howTitle')}</h4>
             <p className="text-sm text-foreground/80 leading-relaxed">{t('project.howDesc')}</p>
           </div>
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border hover:border-purple-400/30 transition-colors">
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border">
             <h4 className="text-lg font-bold mb-2 text-purple-400">{t('project.whyTitle')}</h4>
             <p className="text-sm text-foreground/80 leading-relaxed">{t('project.whyDesc')}</p>
           </div>
@@ -971,8 +971,8 @@ function ProjectView() {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((num) => (
-            <div key={num} className="glass-panel p-6 group hover:border-primary/40 transition-colors">
-              <div className="w-10 h-10 rounded-xl bg-foreground/5 flex items-center justify-center text-primary font-bold mb-4 group-hover:scale-110 transition-transform">
+            <div key={num} className="glass-panel p-6">
+              <div className="w-10 h-10 rounded-xl bg-foreground/5 flex items-center justify-center text-primary font-bold mb-4">
                 0{num}
               </div>
               <h4 className="text-lg font-bold text-foreground mb-2">{t(`project.module${num}`)}</h4>
@@ -1173,7 +1173,7 @@ function RetentionView() {
       {!loading && cohorts.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in duration-500">
           <div 
-            className="glass-panel p-6 border-l-4 border-success cursor-pointer hover:border-success/50 hover:bg-success/5 transition-all group"
+            className="glass-panel p-6 border-l-4 border-success"
             onClick={() => {
               const query = lang === 'fr' 
                 ? `Analyse mon taux de rétention moyen en semaine 1 (${avgW1.toFixed(1)}%). Est-ce un bon score pour un SaaS ?`
@@ -1183,14 +1183,13 @@ function RetentionView() {
           >
             <div className="flex justify-between items-start">
               <p className="text-[10px] uppercase font-bold text-foreground/40 mb-1 tracking-widest">{t('ret.avgW1')}</p>
-              <Sparkles size={12} className="text-success opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <h3 className="text-3xl font-bold text-foreground">{avgW1.toFixed(1)}%</h3>
             <p className="text-[10px] text-success mt-2 font-bold">↑ {t('dash.vsLastMonth')}</p>
           </div>
 
           <div 
-            className="glass-panel p-6 border-l-4 border-primary cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group"
+            className="glass-panel p-6 border-l-4 border-primary"
             onClick={() => {
               const query = lang === 'fr' 
                 ? `Pourquoi la cohorte ${bestCohort?.cohort} est-elle la plus performante avec ${bestCohort?.size} utilisateurs ?`
