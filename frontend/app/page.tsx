@@ -51,7 +51,7 @@ function KPICard({ title, value, icon: Icon, trend, color, t, granularity, detai
               </h3>
             </div>
             <div className="flex flex-col items-end gap-1.5 shrink-0">
-              <div className={`p-2 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/5 text-${color} shadow-inner`}>
+              <div className={`p-2 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-card-border text-${color} shadow-inner`}>
                 <Icon size={18} />
               </div>
               <button 
@@ -214,13 +214,13 @@ function DashboardView() {
                       { user: 'usr_112', event: 'Feature: Copilot', time: '3m ago', color: 'primary' },
                       { user: 'usr_665', event: 'Feature: Export', time: '5m ago', color: 'primary' },
                    ].map((log, i) => (
-                      <div key={i} className="flex items-center justify-between text-[11px] p-2 rounded-lg bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
+                      <div key={i} className="w-full flex items-center justify-between transition-all p-3 rounded-xl text-foreground/80 hover:text-primary hover:bg-primary/10 hover:scale-105 border border-card-border transition-colors">
                          <div className="flex items-center gap-2">
                             <div className={`w-1.5 h-1.5 rounded-full bg-${log.color}`} />
                             <span className="font-bold text-foreground/80">{log.user}</span>
                             <span className="text-foreground/40">{log.event}</span>
                          </div>
-                         <span className="text-[9px] opacity-30">{log.time}</span>
+                         <span className="text-[9px] opacity-60">{log.time}</span>
                       </div>
                    ))}
                 </div>
@@ -235,7 +235,7 @@ function DashboardView() {
                           XGBoost Accuracy
                           <Info size={10} className="cursor-help text-foreground/20 group-hover:text-primary transition-colors" />
                         </p>
-                        <div className="absolute top-full left-0 mt-2 w-48 p-2 bg-black/95 text-[10px] text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 normal-case font-normal border border-white/10 backdrop-blur-xl shadow-xl">
+                        <div className="absolute top-full left-0 mt-2 w-48 p-2 bg-popover text-[10px] text-popover-foreground rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 normal-case font-normal border border-card-border backdrop-blur-xl shadow-xl">
                           {t('ml.accuracyDesc')}
                         </div>
                         <h4 className="text-2xl font-bold text-foreground text-glow">75.5%</h4>
@@ -247,7 +247,7 @@ function DashboardView() {
                          <span className="text-foreground/40 uppercase">Model Health</span>
                          <span className="text-success">EXCELLENT</span>
                       </div>
-                      <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                      <div className="w-full bg-foreground/5 h-1.5 rounded-full overflow-hidden">
                          <div className="bg-primary h-full w-[75.5%] animate-pulse" />
                       </div>
                    </div>
@@ -259,7 +259,7 @@ function DashboardView() {
                           Average Retention
                           <Info size={10} className="cursor-help text-foreground/20 group-hover:text-primary transition-colors" />
                         </p>
-                        <div className="absolute top-full left-0 mt-2 w-48 p-2 bg-black/95 text-[10px] text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 normal-case font-normal border border-white/10 backdrop-blur-xl shadow-xl">
+                        <div className="absolute top-full left-0 mt-2 w-48 p-2 bg-popover text-[10px] text-popover-foreground rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 normal-case font-normal border border-card-border backdrop-blur-xl shadow-xl">
                           {t('ret.avgDesc')}
                         </div>
                         <h4 className="text-2xl font-bold text-foreground text-glow">64.2%</h4>
@@ -297,7 +297,7 @@ function DashboardView() {
             <div className="glass-panel p-6 animate-in fade-in duration-500 shrink-0">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="font-semibold">{t('dash.revTrend')}</h3>
-                <div className="flex bg-white/5 rounded-lg p-1">
+                <div className="flex bg-foreground/5 rounded-lg p-1">
                   {(['year', 'month', 'week', 'day'] as const).map(g => (
                     <button 
                       key={g} 
@@ -318,18 +318,19 @@ function DashboardView() {
                         <stop offset="95%" stopColor={colors.primary} stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
-                    <XAxis dataKey="name" stroke="rgba(var(--foreground-rgb), 0.5)" tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} axisLine={false} tickLine={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--foreground)" strokeOpacity={0.1} vertical={false} />
+                    <XAxis dataKey="name" stroke="var(--foreground)" strokeOpacity={0.6} tick={{fill: 'var(--foreground)', opacity: 0.8, fontSize: 10}} axisLine={false} tickLine={false} />
                     <YAxis 
-                      stroke="rgba(var(--foreground-rgb), 0.5)" 
-                      tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} 
+                      stroke="var(--foreground)" 
+                      strokeOpacity={0.6} 
+                      tick={{fill: 'var(--foreground)', opacity: 0.8, fontSize: 10}} 
                       axisLine={false} 
                       tickLine={false}
                       tickFormatter={(val) => new Intl.NumberFormat().format(val)}
                     />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
-                      itemStyle={{ color: '#fff' }}
+                      contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--card-border)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
+                      itemStyle={{ color: 'var(--foreground)' }}
                       formatter={(value: any) => [new Intl.NumberFormat().format(value), t('dash.revenue')]}
                     />
                     <Area 
@@ -399,8 +400,8 @@ function DashboardView() {
                       ))}
                     </Pie>
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                      itemStyle={{ color: '#fff' }}
+                      contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--card-border)', borderRadius: '8px' }}
+                      itemStyle={{ color: 'var(--foreground)' }}
                       formatter={(value: any) => new Intl.NumberFormat().format(value)}
                     />
                   </PieChart>
@@ -413,8 +414,8 @@ function DashboardView() {
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold">Conversion Rate (%)</h3>
                   <div className="group relative">
-                    <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 p-2 text-xs bg-slate-800 text-gray-200 rounded border border-slate-700 z-10 text-center shadow-lg">
+                    <Info className="w-4 h-4 text-foreground/40 cursor-help" />
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 p-2 text-xs bg-background text-foreground rounded border border-card-border z-10 text-center shadow-lg">
                       {lang === 'fr' 
                         ? "Calculé selon le % d'utilisateurs avec un plan payant (Pro, Enterprise) sur l'ensemble des utilisateurs actifs (Base GCP)."
                         : "Calculated as the % of users with a paid plan (Pro, Enterprise) out of all active users (GCP Data)."}
@@ -426,12 +427,12 @@ function DashboardView() {
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={conversions?.history || []}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
-                    <XAxis dataKey="month" stroke="rgba(var(--foreground-rgb), 0.5)" tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} />
-                    <YAxis stroke="rgba(var(--foreground-rgb), 0.5)" tick={{fill: 'rgba(var(--foreground-rgb), 0.5)', fontSize: 10}} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} vertical={false} />
+                    <XAxis dataKey="month" stroke="var(--foreground)" strokeOpacity={0.6} tick={{fill: 'var(--foreground)', opacity: 0.8, fontSize: 10}} />
+                    <YAxis stroke="var(--foreground)" strokeOpacity={0.6} tick={{fill: 'var(--foreground)', opacity: 0.8, fontSize: 10}} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                      itemStyle={{ color: '#fff' }}
+                      contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--card-border)', borderRadius: '8px' }}
+                      itemStyle={{ color: 'var(--foreground)' }}
                       formatter={(value: any) => new Intl.NumberFormat().format(value)}
                     />
                     <Bar 
@@ -494,7 +495,7 @@ function SegmentsView() {
                 {t(`seg.desc.${seg?.name}`)}
               </p>
             </div>
-            <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
+            <div className="mt-4 pt-4 border-t border-card-border flex items-center justify-between">
               <span className="text-[10px] text-foreground/40 uppercase font-bold tracking-tighter">Distribution</span>
               <span className="text-xs font-mono text-primary">{(seg?.percentage || 0).toFixed(1)}%</span>
             </div>
@@ -505,7 +506,7 @@ function SegmentsView() {
       <div className="glass-panel overflow-visible">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-white/5 border-b border-white/10">
+            <tr className="bg-foreground/5 border-b border-card-border">
               <th className="p-4 text-xs font-bold uppercase text-foreground/60">Segment</th>
               <th className="p-4 text-xs font-bold uppercase text-foreground/60">Count</th>
               <th className="p-4 text-xs font-bold uppercase text-foreground/60 group relative">
@@ -513,7 +514,7 @@ function SegmentsView() {
                   Avg Score
                   <Info size={12} className="cursor-help text-foreground/40 group-hover:text-primary transition-colors" />
                 </div>
-                <div className="absolute top-full left-0 mt-2 w-56 p-3 bg-black/95 text-[11px] text-white rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 normal-case font-normal border border-white/10 backdrop-blur-xl shadow-2xl translate-y-1 group-hover:translate-y-0">
+                <div className="absolute top-full left-0 mt-2 w-56 p-3 bg-popover text-[11px] text-popover-foreground rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 normal-case font-normal border border-card-border backdrop-blur-xl shadow-2xl translate-y-1 group-hover:translate-y-0">
                   <p className="font-bold mb-1 text-primary">{t('seg.avgScoreTitle')}</p>
                   {t('seg.avgScoreDesc')}
                 </div>
@@ -523,7 +524,7 @@ function SegmentsView() {
                   Inactivity
                   <Info size={12} className="cursor-help text-foreground/40 group-hover:text-primary transition-colors" />
                 </div>
-                <div className="absolute top-full left-0 mt-2 w-56 p-3 bg-black/95 text-[11px] text-white rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 normal-case font-normal border border-white/10 backdrop-blur-xl shadow-2xl translate-y-1 group-hover:translate-y-0">
+                <div className="absolute top-full left-0 mt-2 w-56 p-3 bg-popover text-[11px] text-popover-foreground rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 normal-case font-normal border border-card-border backdrop-blur-xl shadow-2xl translate-y-1 group-hover:translate-y-0">
                   <p className="font-bold mb-1 text-primary">{t('seg.inactivityTitle')}</p>
                   {t('seg.inactivityDesc')}
                 </div>
@@ -533,10 +534,10 @@ function SegmentsView() {
           </thead>
           <tbody>
             {segments.map((seg, idx) => (
-              <tr key={seg?.name || idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+              <tr key={seg?.name || idx} className="border-b border-card-border hover:bg-foreground/5 transition-colors">
                 <td className="p-4 font-medium capitalize group relative cursor-help">
                   {(seg?.name || 'unknown').replace('_', ' ')}
-                  <div className="absolute left-0 bottom-full mb-2 w-48 p-2 bg-black/95 text-[10px] text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 normal-case font-normal border border-white/10 backdrop-blur-xl shadow-xl">
+                  <div className="absolute left-0 bottom-full mb-2 w-48 p-2 bg-popover text-[10px] text-popover-foreground rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 normal-case font-normal border border-card-border backdrop-blur-xl shadow-xl">
                     {t(`seg.desc.${seg?.name}`)}
                   </div>
                 </td>
@@ -585,7 +586,7 @@ function MLView() {
         </button>
       </div>
 
-      <div className="glass-panel p-6 bg-slate-800/50 border border-white/5 mb-6">
+      <div className="glass-panel p-6 bg-foreground/5 border border-card-border mb-6">
         <h3 className="font-bold text-foreground mb-2 flex items-center gap-2">
           <Brain size={18} className="text-primary" /> {t('ml.trainingTitle')}
         </h3>
@@ -599,7 +600,7 @@ function MLView() {
           <p className="text-sm font-medium text-foreground/60 mb-1">XGBoost Accuracy</p>
           <h3 className="text-2xl font-bold text-foreground">{((metrics?.xgboost?.accuracy || 0) * 100).toFixed(1)}%</h3>
           <p className="text-[10px] text-foreground/40 mt-1 leading-tight">{t('ml.accuracyDesc')}</p>
-          <div className="w-full bg-white/5 h-2 rounded-full mt-3 overflow-hidden">
+          <div className="w-full bg-foreground/5 h-2 rounded-full mt-3 overflow-hidden">
             <div className="bg-success h-full transition-all" style={{ width: `${((metrics?.xgboost?.accuracy || 0) * 100)}%` }} />
           </div>
         </div>
@@ -624,13 +625,13 @@ function MLView() {
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={churnScores.slice(0, 20)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                <XAxis dataKey="user_id" tick={false} stroke="rgba(255,255,255,0.1)" />
-                <YAxis stroke="rgba(255,255,255,0.1)" tick={{fill: 'rgba(255,255,255,0.3)', fontSize: 10}} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--foreground)" strokeOpacity={0.1} vertical={false} />
+                <XAxis dataKey="user_id" tick={false} stroke="var(--foreground)" strokeOpacity={0.2} />
+                <YAxis stroke="var(--foreground)" strokeOpacity={0.2} tick={{fill: 'var(--foreground)', opacity: 0.8, fontSize: 10}} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'rgba(10, 17, 24, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
-                  itemStyle={{ color: '#fff' }}
-                  cursor={{fill: 'rgba(255,255,255,0.05)'}}
+                  contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--card-border)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
+                  itemStyle={{ color: 'var(--foreground)' }}
+                  cursor={{fill: 'var(--foreground)', fillOpacity: 0.05}}
                   formatter={(value: any) => `${(Number(value) * 100).toFixed(1)}%`}
                 />
                 <Bar 
@@ -672,14 +673,13 @@ function MLView() {
                     : []
                 } 
                 layout="vertical"
-                margin={{ left: 30, right: 30 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
-                <XAxis type="number" stroke="rgba(255,255,255,0.1)" tick={{fill: 'rgba(255,255,255,0.3)', fontSize: 10}} />
-                <YAxis dataKey="name" type="category" stroke="rgba(255,255,255,0.1)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 10}} width={120} />
+                margin={{ left: 30, right: 30 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--foreground)" strokeOpacity={0.1} horizontal={false} />
+                <XAxis type="number" stroke="var(--foreground)" strokeOpacity={0.2} tick={{fill: 'var(--foreground)', opacity: 0.8, fontSize: 10}} />
+                <YAxis dataKey="name" type="category" stroke="var(--foreground)" strokeOpacity={0.2} tick={{fill: 'var(--foreground)', opacity: 0.8, fontSize: 10}} width={120} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'rgba(10, 17, 24, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
-                  itemStyle={{ color: '#fff' }}
+                  contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--card-border)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
+                  itemStyle={{ color: 'var(--foreground)' }}
                   formatter={(value: any) => (value as number).toFixed(4)}
                 />
                 <Bar 
@@ -739,7 +739,7 @@ function RecommendationSection({ userId }: { userId: string }) {
     } catch (e) {}
   };
 
-  if (loading) return <div className="glass-panel p-6 animate-pulse bg-white/5 h-32" />;
+  if (loading) return <div className="glass-panel p-6 animate-pulse bg-foreground/5 h-32" />;
   if (!rec) return null;
 
   return (
@@ -753,7 +753,7 @@ function RecommendationSection({ userId }: { userId: string }) {
             <Sparkles size={20} />
           </div>
           <div>
-            <h3 className="font-bold text-white">{t('seg.recommendation')}</h3>
+            <h3 className="font-bold text-foreground">{t('seg.recommendation')}</h3>
             <p className="text-xs text-foreground/60">{t('seg.suggested')} for User {userId.slice(0, 8)}...</p>
           </div>
         </div>
@@ -762,14 +762,14 @@ function RecommendationSection({ userId }: { userId: string }) {
         <div className="flex items-center gap-2">
           <button 
             onClick={() => handleFeedback(true)}
-            className={`p-2 rounded-lg transition-all ${feedback === true ? 'bg-success text-white' : 'bg-white/5 text-foreground/40 hover:text-success hover:bg-success/10'}`}
+            className={`p-2 rounded-lg transition-all ${feedback === true ? 'bg-success text-white' : 'bg-foreground/5 text-foreground/40 hover:text-success hover:bg-success/10'}`}
             disabled={feedback !== null}
           >
             <ThumbsUp size={16} />
           </button>
           <button 
             onClick={() => handleFeedback(false)}
-            className={`p-2 rounded-lg transition-all ${feedback === false ? 'bg-danger text-white' : 'bg-white/5 text-foreground/40 hover:text-danger hover:bg-danger/10'}`}
+            className={`p-2 rounded-lg transition-all ${feedback === false ? 'bg-danger text-white' : 'bg-foreground/5 text-foreground/40 hover:text-danger hover:bg-danger/10'}`}
             disabled={feedback !== null}
           >
             <ThumbsDown size={16} />
@@ -777,7 +777,7 @@ function RecommendationSection({ userId }: { userId: string }) {
         </div>
       </div>
 
-      <div className="bg-black/20 p-4 rounded-xl border border-white/5 relative z-10">
+      <div className="bg-foreground/5 p-4 rounded-xl border border-card-border relative z-10">
         <p className="text-sm text-foreground italic leading-relaxed">
           "{rec.message}"
         </p>
@@ -887,7 +887,7 @@ function DecisionEngineView() {
         ) : (
           <div className="space-y-4">
             {rules.map((rule) => (
-              <div key={rule.id} className="p-6 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:border-primary/50 transition-all">
+              <div key={rule.id} className="p-6 bg-foreground/5 border border-card-border rounded-2xl flex items-center justify-between group hover:border-primary/50 transition-all">
                 <div className="flex-1 pr-8">
                   <h4 className="text-foreground font-bold mb-1 text-lg">{rule.name}</h4>
                   <p className="text-foreground/60 text-sm leading-relaxed">{rule.description}</p>
@@ -946,19 +946,19 @@ function ProjectView() {
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-white/5 hover:border-amber-400/30 transition-colors">
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border hover:border-amber-400/30 transition-colors">
             <h4 className="text-lg font-bold mb-2 text-amber-400">{t('project.saasTitle')}</h4>
             <p className="text-sm text-foreground/80 leading-relaxed">{t('project.saasDesc')}</p>
           </div>
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-white/5 hover:border-blue-400/30 transition-colors">
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border hover:border-blue-400/30 transition-colors">
             <h4 className="text-lg font-bold mb-2 text-blue-400">{t('project.whatTitle')}</h4>
             <p className="text-sm text-foreground/80 leading-relaxed">{t('project.whatDesc')}</p>
           </div>
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-white/5 hover:border-emerald-400/30 transition-colors">
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border hover:border-emerald-400/30 transition-colors">
             <h4 className="text-lg font-bold mb-2 text-emerald-400">{t('project.howTitle')}</h4>
             <p className="text-sm text-foreground/80 leading-relaxed">{t('project.howDesc')}</p>
           </div>
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-white/5 hover:border-purple-400/30 transition-colors">
+          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border hover:border-purple-400/30 transition-colors">
             <h4 className="text-lg font-bold mb-2 text-purple-400">{t('project.whyTitle')}</h4>
             <p className="text-sm text-foreground/80 leading-relaxed">{t('project.whyDesc')}</p>
           </div>
@@ -973,7 +973,7 @@ function ProjectView() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div key={num} className="glass-panel p-6 group hover:border-primary/40 transition-colors">
-              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary font-bold mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-foreground/5 flex items-center justify-center text-primary font-bold mb-4 group-hover:scale-110 transition-transform">
                 0{num}
               </div>
               <h4 className="text-lg font-bold text-foreground mb-2">{t(`project.module${num}`)}</h4>
@@ -1014,7 +1014,7 @@ function ProjectView() {
           <p className="text-sm text-foreground/60 mb-6">{t('project.techList')}</p>
           <div className="flex flex-wrap gap-3">
             {['FastAPI', 'Python', 'XGBoost', 'K-Means', 'Next.js 14', 'PostgreSQL', 'OpenAI GPT-4o'].map(tech => (
-              <span key={tech} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-foreground/80">
+              <span key={tech} className="px-3 py-1.5 rounded-lg bg-foreground/5 border border-card-border text-xs font-medium text-foreground/80">
                 {tech}
               </span>
             ))}
@@ -1038,7 +1038,7 @@ function ProjectView() {
       </div>
 
       {/* Data Strategy */}
-      <section className="p-6 bg-white/5 rounded-2xl border border-white/5 flex items-center gap-6">
+      <section className="p-6 bg-foreground/5 rounded-2xl border border-card-border flex items-center gap-6">
         <div className="p-4 bg-primary/10 rounded-2xl text-primary shrink-0">
           <Activity size={32} />
         </div>
@@ -1082,7 +1082,7 @@ function RetentionView() {
     if (value >= 60) return 'bg-primary/60';
     if (value >= 40) return 'bg-primary/40';
     if (value >= 20) return 'bg-primary/20';
-    return 'bg-white/5';
+    return 'bg-foreground/5';
   };
 
   const filteredCohorts = selectedCohorts.length > 0 
@@ -1125,7 +1125,7 @@ function RetentionView() {
 
           {isDropdownOpen && (
             <div className="absolute top-full right-0 mt-2 w-64 glass-panel p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200">
-              <div className="p-2 border-b border-white/5 flex justify-between items-center mb-1">
+              <div className="p-2 border-b border-card-border flex justify-between items-center mb-1">
                  <span className="text-[10px] uppercase font-bold text-foreground/40 tracking-widest">{lang === 'fr' ? 'SÉLECTION' : 'SELECT COHORTS'}</span>
                  <div className="flex gap-3">
                    <button 
@@ -1148,10 +1148,10 @@ function RetentionView() {
                 {cohorts.map(c => (
                   <label 
                     key={c.cohort} 
-                    className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all hover:bg-white/5 group ${selectedCohorts.includes(c.cohort) ? 'bg-primary/5' : ''}`}
+                    className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all hover:bg-foreground/5 group ${selectedCohorts.includes(c.cohort) ? 'bg-primary/5' : ''}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${selectedCohorts.includes(c.cohort) ? 'bg-primary border-primary' : 'border-white/10 bg-white/5 group-hover:border-white/30'}`}>
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${selectedCohorts.includes(c.cohort) ? 'bg-primary border-primary' : 'border-card-border bg-foreground/5 group-hover:border-white/30'}`}>
                         {selectedCohorts.includes(c.cohort) && <Check size={10} className="text-white" />}
                       </div>
                       <span className={`text-sm ${selectedCohorts.includes(c.cohort) ? 'text-primary font-bold underline decoration-primary/30 underline-offset-4' : 'text-foreground/60'}`}>{c.cohort}</span>
@@ -1238,7 +1238,7 @@ function RetentionView() {
           <div className="glass-panel overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
-                <tr className="bg-white/5 border-b border-white/10">
+                <tr className="bg-foreground/5 border-b border-card-border">
                   <th className="p-4 text-xs font-bold uppercase text-foreground/60">Cohorte</th>
                   <th className="p-4 text-xs font-bold uppercase text-foreground/60">{t('ret.size')}</th>
                   {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(w => (
@@ -1250,7 +1250,7 @@ function RetentionView() {
               </thead>
               <tbody>
                 {filteredCohorts.map((c, idx) => (
-                  <tr key={c.cohort || idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                  <tr key={c.cohort || idx} className="border-b border-card-border hover:bg-foreground/5 transition-colors">
                     <td className="p-4 font-mono text-sm font-bold text-white/90">{c.cohort}</td>
                     <td className="p-4 text-sm font-medium text-foreground/40">{c.size}</td>
                     {Array.from({ length: 9 }).map((_, wIndex) => {
@@ -1335,7 +1335,7 @@ function SettingsView() {
             <Users size={20} className="text-primary" /> {t('set.profile')}
           </h3>
           <div className="space-y-6">
-            <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+            <div className="flex items-center gap-4 p-4 bg-foreground/5 rounded-2xl border border-card-border">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl font-bold text-white shadow-xl shadow-primary/20">
                 JD
               </div>
@@ -1368,7 +1368,7 @@ function SettingsView() {
                 className={`flex items-center justify-between p-4 rounded-2xl border transition-all group ${
                   theme === th.id 
                     ? 'bg-primary/10 border-primary shadow-lg shadow-primary/10' 
-                    : 'bg-white/5 border-white/5 hover:border-white/20'
+                    : 'bg-foreground/5 border-card-border hover:border-white/20'
                 }`}
               >
                 <div className="flex items-center gap-4">
@@ -1435,7 +1435,7 @@ function LoginView({ onLogin }: { onLogin: () => void }) {
               <input 
                 type="email" required
                 value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/20 rounded-lg py-3 pl-10 pr-4 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-black/5 dark:bg-foreground/5 border border-black/20 dark:border-white/20 rounded-lg py-3 pl-10 pr-4 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
                 placeholder="admin@acme.com"
               />
             </div>
@@ -1448,7 +1448,7 @@ function LoginView({ onLogin }: { onLogin: () => void }) {
               <input 
                 type="password" required
                 value={password} onChange={e => setPassword(e.target.value)}
-                className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/20 rounded-lg py-3 pl-10 pr-4 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-black/5 dark:bg-foreground/5 border border-black/20 dark:border-white/20 rounded-lg py-3 pl-10 pr-4 text-foreground focus:outline-none focus:border-primary/50 transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -1551,7 +1551,7 @@ function AppContent({ onLogout }: { onLogout: () => void }) {
     <div className="flex h-screen bg-background overflow-hidden relative w-full">
       <Sidebar activeView={currentView} onViewChange={handleViewChange} />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <header className="h-16 flex items-center justify-between px-8 border-b border-white/5 bg-background/50 backdrop-blur-md z-10 shrink-0">
+        <header className="h-16 flex items-center justify-between px-8 border-b border-card-border bg-background/50 backdrop-blur-md z-10 shrink-0">
           <div className="flex items-center gap-4">
              <h2 className="text-foreground/40 text-xs font-bold uppercase tracking-widest">{currentView}</h2>
           </div>
@@ -1655,7 +1655,7 @@ function NotificationBell() {
 
       {show && (
         <div ref={dropdownRef} className="absolute right-0 mt-4 w-80 glass-panel p-0 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 z-50">
-          <div className="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
+          <div className="p-4 border-b border-card-border flex justify-between items-center bg-foreground/5">
             <div className="flex items-center gap-3">
               <h4 className="font-bold text-sm">{t('notif.title')}</h4>
               <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold">{unreadCount} {t('notif.new')}</span>
@@ -1675,7 +1675,7 @@ function NotificationBell() {
               <p className="p-8 text-center text-sm text-foreground/40 italic">{t('notif.empty')}</p>
             ) : (
               notifications.map(n => (
-                <div key={n.id} className={`p-4 border-b border-white/5 hover:bg-white/5 transition-colors ${!n.read ? 'bg-primary/5' : ''}`}>
+                <div key={n.id} className={`p-4 border-b border-card-border hover:bg-foreground/5 transition-colors ${!n.read ? 'bg-primary/5' : ''}`}>
                   <div className="flex justify-between items-start mb-1">
                     <p className={`text-xs font-bold ${n.type === 'danger' ? 'text-danger' : n.type === 'success' ? 'text-success' : 'text-white'}`}>{n.title}</p>
                     {!n.read && <button onClick={() => handleRead(n.id)} className="text-primary hover:text-white transition-colors"><Check size={14} /></button>}

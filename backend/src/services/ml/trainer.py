@@ -21,6 +21,9 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.metrics import silhouette_score
 
 from services.ml.feature_engineering import load_features_from_db, FEATURE_COLS
+from core.database import SessionLocal
+from core.models import User
+from sqlalchemy import text
 from services.storage_service import upload_model_to_gcs
 
 MODELS_DIR = Path(__file__).parent / "models"
@@ -114,7 +117,42 @@ if __name__ == "__main__":
         json.dump(metrics, f, indent=2)
     upload_model_to_gcs(str(MODELS_DIR / "metrics.json"), "models/metrics.json")
 
-    print("\n[DONE] Entrainement termine !")
+    print("\n[PERSISTENCE] Sauvegarde des rAsultats dans PostgreSQL...")
+    db = SessionLocal()
+    try:
+        # PrAdiction des segments finaux pour tous les utilisateurs
+        X_scaled = scaler.transform(df[FEATURE_COLS])
+        df["cluster"] = kmeans.predict(X_scaled)
+        
+        # Mapping dynamique (identique A predictor.py)
+        cluster_stats = df.groupby("cluster")["engagement_score"].mean().sort_values(ascending=False)
+        dynamic_map = {cluster_id: name for cluster_id, name in zip(cluster_stats.index, ["power_user", "casual", "at_risk", "dormant"])}
+        df["segment_name"] = df["cluster"].map(dynamic_map)
+        
+        # PrAdiction des scores de churn
+        X_xgb = df[FEATURE_COLS + ["plan_encoded"]]
+        df["churn_score"] = model.predict_proba(X_xgb)[:, 1]
+        
+        # Mise A jour par lots (bulk update) pour la performance
+        updated = 0
+        for _, row in df.iterrows():
+            db.execute(
+                text("UPDATE users SET segment = :seg, churn_score = :churn WHERE user_id = :uid"),
+                {"seg": row["segment_name"], "churn": float(row["churn_score"]), "uid": row["user_id"]}
+            )
+            updated += 1
+            if updated % 1000 == 0:
+                db.commit()
+                print(f"  - {updated} utilisateurs synchronisAs...")
+        db.commit()
+        print(f"  [OK] {updated} utilisateurs mis A jour dans la base.")
+    except Exception as e:
+        print(f"  [ERROR] Erreur persistence : {e}")
+        db.rollback()
+    finally:
+        db.close()
+
+    print("\n[DONE] Entrainement et synchronisation terminAs !")
     print(f"  XGBoost accuracy    : {acc:.2%}")
     print(f"  K-Means silhouette  : {sil:.4f}")
     print(f"  [SAVED] metrics.json -> {MODELS_DIR / 'metrics.json'}")

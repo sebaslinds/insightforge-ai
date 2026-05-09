@@ -115,7 +115,7 @@ body {
 
 /* Skeleton Shimmer */
 .skeleton {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(var(--foreground-rgb), 0.05);
   position: relative;
   overflow: hidden;
   border-radius: 0.5rem;
@@ -128,7 +128,7 @@ body {
   right: 0;
   bottom: 0;
   left: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--foreground-rgb), 0.05), transparent);
   animation: shimmer 1.5s infinite;
 }
 
@@ -198,24 +198,24 @@ body {
   margin: 1rem 0;
   border-radius: 0.5rem;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--card-border);
 }
 
 .markdown-content th {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(var(--foreground-rgb), 0.05);
   padding: 0.5rem;
   text-align: left;
   font-weight: 700;
   font-size: 0.75rem;
   text-transform: uppercase;
   color: var(--primary);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--card-border);
 }
 
 .markdown-content td {
   padding: 0.5rem;
   font-size: 0.8rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--card-border);
 }
 
 .markdown-content ul, .markdown-content ol {

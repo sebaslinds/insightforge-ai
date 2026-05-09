@@ -75,8 +75,8 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
                   <stop offset="95%" stopColor={colors.primary} stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
+              <XAxis dataKey="name" stroke="rgba(var(--foreground-rgb), 0.2)" fontSize={10} tickLine={false} axisLine={false} tick={{fill: 'rgba(var(--foreground-rgb), 0.5)'}} />
               <YAxis hide />
               <Tooltip content={<CustomTooltip />} />
               <Area type="monotone" dataKey="value" stroke={colors.primary} strokeWidth={2} fillOpacity={1} fill="url(#chatColor)" />
@@ -122,8 +122,8 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
         <div className="h-[160px] w-[260px] mx-auto relative">
           <ResponsiveContainer width="100%" height="100%" key={jsonStr}>
             <BarChart data={processedData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
+              <XAxis dataKey="name" stroke="rgba(var(--foreground-rgb), 0.2)" fontSize={10} tickLine={false} axisLine={false} tick={{fill: 'rgba(var(--foreground-rgb), 0.5)'}} />
               <YAxis hide />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="value" fill={colors.primary} radius={[4, 4, 0, 0]} />
@@ -237,7 +237,7 @@ export default function AICopilot() {
 
   return (
     <div className="flex flex-col h-full glass-panel overflow-hidden">
-      <div className="p-3 border-b border-white/10 bg-white/5 flex items-center space-x-2">
+      <div className="p-3 border-b border-card-border bg-foreground/5 flex items-center space-x-2">
         <Bot style={{ color: 'var(--primary)' }} size={20} />
         <h3 className="font-semibold text-base">{t('copilot.header')}</h3>
       </div>
@@ -247,8 +247,8 @@ export default function AICopilot() {
           <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}>
             <div className={`max-w-[90%] rounded-2xl p-4 ${
               msg.role === "user" 
-                ? "bg-primary text-white rounded-br-none" 
-                : "bg-white/10 text-foreground rounded-bl-none"
+                ? "bg-primary text-primary-foreground rounded-br-none" 
+                : "bg-foreground/10 text-foreground rounded-bl-none"
             }`}>
               <div className="flex items-center space-x-2 mb-1 opacity-70 text-xs">
                 {msg.role === "user" ? <User size={12} /> : <Bot size={12} />}
@@ -260,7 +260,7 @@ export default function AICopilot() {
               </div>
 
               {msg.content.includes('```json') && (
-                <div className="mt-4 bg-black/40 p-4 rounded-2xl border border-white/10 w-full min-h-[180px] flex flex-col justify-center">
+                <div className="mt-4 bg-background/40 p-4 rounded-2xl border border-card-border w-full min-h-[180px] flex flex-col justify-center">
                   <ChatVisualizer jsonStr={msg.content.split('```json')[1].split('```')[0]} />
                 </div>
               )}
@@ -298,7 +298,7 @@ export default function AICopilot() {
               )}
               
               {msg.executionResults && msg.executionResults.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-white/10">
+                <div className="mt-3 pt-3 border-t border-card-border">
                   <div className="text-xs font-semibold opacity-70 uppercase tracking-wider mb-2">{t('copilot.actions')}</div>
                   {msg.executionResults.map((res, idx) => (
                     <div key={idx} className="flex items-center space-x-2 text-xs text-success">
@@ -343,14 +343,14 @@ export default function AICopilot() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-3 border-t border-white/10 bg-white/5">
+      <div className="p-3 border-t border-card-border bg-foreground/5">
         {messages.length === 1 && !isLoading && (
           <div className="mb-2 flex flex-wrap gap-2">
             {suggestedPrompts.map((prompt, idx) => (
               <button
                 key={idx}
                 onClick={() => sendQuery(prompt)}
-                className="text-[10px] px-2.5 py-1 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                className="text-[10px] px-2.5 py-1 rounded-full border border-card-border bg-foreground/5 hover:bg-foreground/10 transition-colors"
               >
                 {prompt}
               </button>
@@ -363,7 +363,7 @@ export default function AICopilot() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={t('copilot.placeholder')}
-            className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-4 pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 text-foreground placeholder-foreground/40"
+            className="w-full bg-foreground/5 border border-card-border rounded-xl py-2 pl-4 pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 text-foreground placeholder-foreground/40"
             disabled={isLoading}
           />
           <button 
