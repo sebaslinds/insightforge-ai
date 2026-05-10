@@ -1,1 +1,21 @@
-{"xgboost": {"accuracy": 0.859, "status": "trained", "feature_importance": {"session_count_7d": 0.11583026498556137, "feature_breadth": 0.08669090270996094, "avg_session_duration_min": 0.16143898665905, "days_since_last_use": 0.35294950008392334, "engagement_score": 0.2001219093799591, "plan_encoded": 0.08296846598386765}}, "kmeans": {"silhouette": 0.2759, "status": "trained"}, "last_trained": "2026-05-08 17:50:48"}
+{
+  "xgboost": {
+    "accuracy": 0.8731,
+    "status": "trained",
+    "n_estimators": 200,
+    "feature_importance": {
+      "session_count_7d": 0.23081442713737488,
+      "feature_breadth": 0.028251023963093758,
+      "avg_session_duration_min": 0.07325147837400436,
+      "days_since_last_use": 0.3404453992843628,
+      "engagement_score": 0.29837891459465027,
+      "plan_encoded": 0.028858819976449013
+    }
+  },
+  "kmeans": {
+    "silhouette": 0.5691,
+    "status": "trained",
+    "n_clusters": 4
+  },
+  "last_trained": "2026-05-09 19:38:10"
+}

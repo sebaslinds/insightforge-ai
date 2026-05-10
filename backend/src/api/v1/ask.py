@@ -43,7 +43,7 @@ async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_use
                         dist = pd.cut(df[col], bins=bins).value_counts().sort_index()
                         data_summary += f"  Distribution {col}: {dist.to_dict()}\n"
                 else:
-                    data_summary += f"- {col}: unique_values={df[col].nunique()}, top_values={df[col].value_counts().head(3).to_dict()}\n"
+                    data_summary += f"- {col}: unique_values={df[col].nunique()}, top_values={df[col].value_counts().head(10).to_dict()}\n"
         else:
             data_summary = df.to_string()
 

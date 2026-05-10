@@ -323,6 +323,7 @@ def generate_report(current_user: AdminUser = Depends(get_current_user), db: Ses
     PERFORMANCE :
     - Taux de Churn : {(churned/total_users*100 if total_users > 0 else 0):.1f}%
     - Revenu Mensuel Estimé : ${(pro_users*49 + ent_users*499):,.2f}
+    - CAC Moyen : ${sum([u.acquisition_cost for u in users if u.acquisition_cost is not None]) / total_users if total_users > 0 else 0:,.2f}
     """
     return {"report": report}
 

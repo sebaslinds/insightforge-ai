@@ -18,7 +18,7 @@ type Message = {
 };
 
 function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
-  const { theme } = useLanguage();
+  const { theme, lang } = useLanguage();
   const colors = THEME_COLORS[theme] || THEME_COLORS.midnight;
   const [shouldRender, setShouldRender] = useState(false);
 
@@ -30,12 +30,14 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      // For Pie charts, the label is usually the name of the slice in payload[0]
+      const displayLabel = label || payload[0].payload.name || payload[0].name;
       return (
-        <div className={`theme-${theme} bg-background/95 backdrop-blur-md border border-card-border p-3 rounded-xl shadow-2xl z-50`}>
-          <p className="text-foreground font-black mb-1 border-b border-foreground/20 pb-1">{label}</p>
+        <div className={`theme-${theme} bg-background/95 backdrop-blur-md border border-card-border p-3 rounded-xl shadow-2xl z-50 min-w-[140px]`}>
+          <p className="text-foreground font-black mb-1 border-b border-foreground/20 pb-1 text-xs uppercase tracking-wider">{displayLabel}</p>
           {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-primary text-sm font-bold flex justify-between gap-4">
-              <span className="opacity-70">{entry.name}:</span>
+            <p key={index} className="text-primary text-sm font-bold flex justify-between gap-4 mt-1">
+              <span className="opacity-70 text-xs">{entry.name === displayLabel ? (lang === 'fr' ? 'Valeur' : 'Value') : entry.name}:</span>
               <span>{new Intl.NumberFormat().format(entry.value)}</span>
             </p>
           ))}
@@ -87,7 +89,15 @@ function ChatVisualizer({ jsonStr }: { jsonStr: string }) {
     }
 
     if (data.type === 'pie') {
-      const PIE_COLORS = [colors.primary || '#3b82f6', colors.secondary || '#10b981', '#f59e0b', '#ef4444', '#10b981'];
+      const PIE_COLORS = [
+        colors.primary || '#3b82f6', 
+        colors.secondary || '#10b981', 
+        '#f59e0b', 
+        '#ef4444', 
+        '#8b5cf6', 
+        '#06b6d4', 
+        '#ec4899'
+      ];
       const processedData = data.items.map((item: any) => ({
         ...item,
         value: Number(item.value)

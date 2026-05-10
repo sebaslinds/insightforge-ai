@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Activity, TrendingUp, Users, AlertTriangle, Settings, Brain, Network, RefreshCw, Loader2, Globe, Info, FileText, Sparkles, Plus, Trash2, Download, Book, Lock, Mail, Key, LogOut, Bell, Check, ThumbsUp, ThumbsDown, Filter, ChevronDown, Server, Cloud, Database, DatabaseZap, Target } from "lucide-react";
+import { Activity, TrendingUp, Users, AlertTriangle, Settings, Brain, Network, RefreshCw, Loader2, Globe, Info, FileText, Sparkles, Plus, Trash2, Download, Book, Lock, Mail, Key, LogOut, Bell, Check, ThumbsUp, ThumbsDown, Filter, ChevronDown, Server, Cloud, Database, DatabaseZap, Target, Zap, Clock, User } from "lucide-react";
 import AICopilot from "./components/AICopilot";
 import Sidebar from "./components/Sidebar";
 import Modal from "./components/Modal";
@@ -486,10 +486,18 @@ function SegmentsView() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {segments.map((seg, idx) => (
           <div key={seg?.name || idx} className="glass-panel p-6 border-l-4 flex flex-col justify-between" style={{ borderLeftColor: SEGMENT_COLORS[seg?.name] || colors.primary }}>
-            <div>
-          <h1 className="text-3xl font-bold mb-2">{t('seg.title')}</h1>
-          <p className="text-foreground/60">{t('seg.subtitle')}</p>
-        </div>
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-xl font-bold mb-1 capitalize">{(seg?.name || '').replace('_', ' ')}</h3>
+                <p className="text-foreground/60 text-[11px] h-8 line-clamp-2 leading-tight">{t(`seg.desc.${seg?.name}`)}</p>
+              </div>
+              <div className="p-2 rounded-lg bg-foreground/5 text-foreground/40">
+                {seg?.name === 'power_user' ? <Zap size={18} className="text-primary" /> :
+                 seg?.name === 'at_risk' ? <AlertTriangle size={18} className="text-warning" /> :
+                 seg?.name === 'dormant' ? <Clock size={18} className="text-danger" /> :
+                 <User size={18} className="text-secondary" />}
+              </div>
+            </div>
             <div className="mt-4 pt-4 border-t border-card-border flex items-center justify-between">
               <span className="text-[10px] text-foreground/40 uppercase font-bold tracking-tighter">Distribution</span>
               <span className="text-xs font-mono text-primary">{(seg?.percentage || 0).toFixed(1)}%</span>
@@ -591,19 +599,41 @@ function MLView() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass-panel p-6">
-          <p className="text-sm font-medium text-foreground/60 mb-1">XGBoost Accuracy</p>
+        <div 
+          className="glass-panel p-6 cursor-pointer hover:bg-primary/5 transition-all group"
+          onClick={() => {
+            const query = lang === 'fr' 
+              ? `Analyse la précision de mon modèle XGBoost (${((metrics?.xgboost?.accuracy || 0) * 100).toFixed(1)}%). Est-ce un bon score et comment l'améliorer ?`
+              : `Analyze the accuracy of my XGBoost model (${((metrics?.xgboost?.accuracy || 0) * 100).toFixed(1)}%). Is this a good score and how can I improve it?`;
+            window.dispatchEvent(new CustomEvent('insightforge-query', { detail: query }));
+          }}
+        >
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-sm font-medium text-foreground/60">XGBoost Accuracy</p>
+            <Sparkles size={12} className="text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
           <h3 className="text-2xl font-bold text-foreground">{((metrics?.xgboost?.accuracy || 0) * 100).toFixed(1)}%</h3>
           <p className="text-[10px] text-foreground/40 mt-1 leading-tight">{t('ml.accuracyDesc')}</p>
           <div className="w-full bg-foreground/5 h-2 rounded-full mt-3 overflow-hidden">
             <div className="bg-success h-full transition-all" style={{ width: `${((metrics?.xgboost?.accuracy || 0) * 100)}%` }} />
           </div>
         </div>
-        <div className="glass-panel p-6">
-           <p className="text-sm font-medium text-foreground/60 mb-1">{t('ml.silhouette')}</p>
-           <h3 className="text-2xl font-bold text-foreground">{(metrics?.kmeans?.silhouette || 0).toFixed(3)}</h3>
-           <p className="text-[10px] text-foreground/40 mt-1 leading-tight">{t('ml.silhouetteDesc')}</p>
-         </div>
+        <div 
+          className="glass-panel p-6 cursor-pointer hover:bg-primary/5 transition-all group"
+          onClick={() => {
+            const query = lang === 'fr' 
+              ? `Explique-moi mon score de Silhouette K-Means (${(metrics?.kmeans?.silhouette || 0).toFixed(3)}). Que signifie-t-il pour la qualité de mes segments ?`
+              : `Explain my K-Means Silhouette score (${(metrics?.kmeans?.silhouette || 0).toFixed(3)}). What does it mean for the quality of my segments?`;
+            window.dispatchEvent(new CustomEvent('insightforge-query', { detail: query }));
+          }}
+        >
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-sm font-medium text-foreground/60">{t('ml.silhouette')}</p>
+            <Sparkles size={12} className="text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+          <h3 className="text-2xl font-bold text-foreground">{(metrics?.kmeans?.silhouette || 0).toFixed(3)}</h3>
+          <p className="text-[10px] text-foreground/40 mt-1 leading-tight">{t('ml.silhouetteDesc')}</p>
+        </div>
         <div className="glass-panel p-6">
           <p className="text-sm font-medium text-foreground/60 mb-1">Last Trained</p>
           <h3 className="text-lg font-bold text-foreground">{metrics?.last_trained || "Just now"}</h3>
@@ -941,21 +971,21 @@ function ProjectView() {
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border">
-            <h4 className="text-lg font-bold mb-2 text-amber-400">{t('project.saasTitle')}</h4>
-            <p className="text-sm text-foreground/80 leading-relaxed">{t('project.saasDesc')}</p>
+          <div className="bg-foreground/[0.03] p-6 rounded-2xl border border-card-border hover:border-primary/20 transition-all">
+            <h4 className="text-lg font-bold mb-2 text-primary/80">{t('project.saasTitle')}</h4>
+            <p className="text-sm text-foreground/70 leading-relaxed">{t('project.saasDesc')}</p>
           </div>
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border">
-            <h4 className="text-lg font-bold mb-2 text-blue-400">{t('project.whatTitle')}</h4>
-            <p className="text-sm text-foreground/80 leading-relaxed">{t('project.whatDesc')}</p>
+          <div className="bg-foreground/[0.03] p-6 rounded-2xl border border-card-border hover:border-primary/20 transition-all">
+            <h4 className="text-lg font-bold mb-2 text-primary/80">{t('project.whatTitle')}</h4>
+            <p className="text-sm text-foreground/70 leading-relaxed">{t('project.whatDesc')}</p>
           </div>
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border">
-            <h4 className="text-lg font-bold mb-2 text-emerald-400">{t('project.howTitle')}</h4>
-            <p className="text-sm text-foreground/80 leading-relaxed">{t('project.howDesc')}</p>
+          <div className="bg-foreground/[0.03] p-6 rounded-2xl border border-card-border hover:border-primary/20 transition-all">
+            <h4 className="text-lg font-bold mb-2 text-primary/80">{t('project.howTitle')}</h4>
+            <p className="text-sm text-foreground/70 leading-relaxed">{t('project.howDesc')}</p>
           </div>
-          <div className="bg-slate-800/50 p-6 rounded-xl border border-card-border">
-            <h4 className="text-lg font-bold mb-2 text-purple-400">{t('project.whyTitle')}</h4>
-            <p className="text-sm text-foreground/80 leading-relaxed">{t('project.whyDesc')}</p>
+          <div className="bg-foreground/[0.03] p-6 rounded-2xl border border-card-border hover:border-primary/20 transition-all">
+            <h4 className="text-lg font-bold mb-2 text-primary/80">{t('project.whyTitle')}</h4>
+            <p className="text-sm text-foreground/70 leading-relaxed">{t('project.whyDesc')}</p>
           </div>
         </div>
       </section>
@@ -1018,13 +1048,13 @@ function ProjectView() {
 
         {/* Glossary Quick View */}
         <section className="glass-panel p-6">
-          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
             <Book size={20} className="text-foreground/40"/> {t('project.lexicon')}
           </h3>
           <div className="space-y-4">
             {['churn', 'engagement', 'breadth'].map(key => (
               <div key={key}>
-                <p className="text-sm font-bold text-white">{t(`project.lex.${key}`)}</p>
+                <p className="text-sm font-bold text-foreground">{t(`project.lex.${key}`)}</p>
                 <p className="text-xs text-foreground/60">{t(`project.lex.${key}Desc`)}</p>
               </div>
             ))}
@@ -1038,7 +1068,7 @@ function ProjectView() {
           <Activity size={32} />
         </div>
         <div>
-          <h4 className="font-bold text-white mb-1">{t('project.dataSource')}</h4>
+          <h4 className="font-bold text-foreground mb-1">{t('project.dataSource')}</h4>
           <p className="text-sm text-foreground/60">{t('project.originDesc')}</p>
         </div>
       </section>
@@ -1214,7 +1244,7 @@ function RetentionView() {
               <p className="text-[10px] uppercase font-bold text-foreground/40 mb-1 tracking-widest">{t('ret.howTo')}</p>
               <Sparkles size={12} className="text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <p className="text-[11px] text-white/70 leading-relaxed mt-2">{t('ret.howToDesc')}</p>
+            <p className="text-[11px] text-foreground/70 leading-relaxed mt-2">{t('ret.howToDesc')}</p>
           </div>
         </div>
       )}
@@ -1245,7 +1275,7 @@ function RetentionView() {
               <tbody>
                 {filteredCohorts.map((c, idx) => (
                   <tr key={c.cohort || idx} className="border-b border-card-border hover:bg-foreground/5 transition-colors">
-                    <td className="p-4 font-mono text-sm font-bold text-white/90">{c.cohort}</td>
+                    <td className="p-4 font-mono text-sm font-bold text-foreground/90">{c.cohort}</td>
                     <td className="p-4 text-sm font-medium text-foreground/40">{c.size}</td>
                     {Array.from({ length: 9 }).map((_, wIndex) => {
                       const value = c.retention[wIndex];
@@ -1275,7 +1305,7 @@ function RetentionView() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="glass-panel p-6 bg-primary/5 border-primary/20">
-              <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+              <h4 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                 <Sparkles size={16} className="text-primary" /> {t('ret.insights')}
               </h4>
               <ul className="space-y-3">
