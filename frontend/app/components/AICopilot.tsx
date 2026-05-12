@@ -209,8 +209,8 @@ export default function AICopilot() {
     try {
       const response = await askAI(userMessage.content, lang);
       
-      if (response.total_carbon_footprint) {
-        setCarbonFootprint(response.total_carbon_footprint);
+      if (response.carbon_footprint) {
+        setCarbonFootprint(prev => (prev || 0) + response.carbon_footprint);
       }
       
       const aiMessage: Message = {
@@ -260,7 +260,7 @@ export default function AICopilot() {
         {carbonFootprint && (
           <div className="flex items-center gap-1.5 text-[10px] font-bold text-success/70 bg-success/5 px-2 py-1 rounded-full border border-success/10 animate-in fade-in zoom-in duration-500" title={lang === 'fr' ? 'Empreinte cumulée' : 'Accumulated footprint'}>
             <span>🌱</span>
-            <span>{lang === 'fr' ? 'Accumulée' : 'Total'}: {carbonFootprint.toFixed(3)}g CO2e</span>
+            <span>{lang === 'fr' ? 'Session' : 'Session'}: {carbonFootprint.toFixed(3)}g CO2e</span>
           </div>
         )}
       </div>

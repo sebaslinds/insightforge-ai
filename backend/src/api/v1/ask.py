@@ -64,16 +64,6 @@ async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_use
     # 9. Calcul Empreinte Carbone
     row_count = len(data)
     current_carbon = 0.2 + (row_count / 1000 * 0.05)
-    
-    # Mise à jour de l'accumulé pour le Tenant
-    tenant = db.query(Tenant).filter(Tenant.id == current_user.tenant_id).first()
-    if tenant:
-        current_total = float(tenant.total_carbon_footprint or 0.0)
-        tenant.total_carbon_footprint = current_total + current_carbon
-        db.commit()
-        total_carbon = tenant.total_carbon_footprint
-    else:
-        total_carbon = current_carbon
 
     return {
         "sql": sql,
@@ -82,6 +72,5 @@ async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_use
         "explanation": explanation,
         "execution_results": execution_results,
         "follow_ups": follow_ups,
-        "carbon_footprint": current_carbon,
-        "total_carbon_footprint": total_carbon
+        "carbon_footprint": current_carbon
     }
