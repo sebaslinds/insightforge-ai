@@ -46,7 +46,7 @@ function KPICard({ title, value, icon: Icon, trend, color, t, granularity, detai
               <p className="text-[8.5px] uppercase font-black text-foreground/40 tracking-tight mb-1 whitespace-normal leading-tight min-h-[20px]" title={title}>
                 {title}
               </p>
-              <h3 className="text-xl font-black text-foreground tracking-tight whitespace-nowrap">
+              <h3 className="text-[1.1rem] font-black text-foreground tracking-tight break-words">
                 {value}
               </h3>
             </div>
@@ -1670,10 +1670,10 @@ function AppContent({ onLogout }: { onLogout: () => void }) {
           </div>
         </header>
         
-        <div className="flex-1 flex overflow-hidden p-8 gap-8">
+        <div className="flex-1 flex overflow-hidden p-8 gap-12">
           {/* Main Content Area */}
           <main className={`flex-1 overflow-y-auto custom-scrollbar transition-all duration-300 transform ${animateState === 'in' ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <div className="max-w-[1200px] mx-auto pb-20">
+            <div className="max-w-[1200px] pb-20">
               {renderView()}
             </div>
           </main>
