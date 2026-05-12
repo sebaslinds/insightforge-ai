@@ -40,39 +40,39 @@ function KPICard({ title, value, icon: Icon, trend, color, t, granularity, detai
         onClick={() => setIsFlipped(!isFlipped)}
       >
         {/* Front */}
-        <div className="flip-card-front glass-panel p-4 flex flex-col justify-between group-hover/card:border-primary/50 transition-all overflow-hidden absolute w-full h-full backface-hidden">
-          <div className="flex justify-between items-start">
-            <div className="flex-1 min-w-0 pr-2">
-              <p className="text-[8.5px] uppercase font-black text-foreground/40 tracking-tight mb-1 whitespace-normal leading-tight min-h-[20px]" title={title}>
+        <div className="flip-card-front glass-panel p-5 flex flex-col justify-between group-hover/card:border-primary/50 transition-all overflow-hidden absolute w-full h-full backface-hidden">
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-start">
+              <p className="text-[9px] uppercase font-black text-foreground/40 tracking-wider mb-0 truncate" title={title}>
                 {title}
               </p>
-              <h3 className="text-[1.1rem] font-black text-foreground tracking-tight break-words">
-                {value}
-              </h3>
-            </div>
-            <div className="flex flex-col items-end gap-1.5 shrink-0">
-              <div className={`p-2 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-card-border text-${color} shadow-inner`}>
-                <Icon size={18} />
+              <div className={`p-2 rounded-xl bg-foreground/5 border border-card-border/50 text-${color} shadow-sm shrink-0`}>
+                <Icon size={16} />
               </div>
-              <button 
-                onClick={handleAIClick}
-                className="p-1.5 rounded-lg bg-primary/10 text-primary opacity-0 group-hover/card:opacity-100 hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/20"
-                title="Ask AI"
-              >
-                <Sparkles size={12} />
-              </button>
             </div>
+            
+            <h3 className="text-[1.3rem] font-black text-foreground tracking-tight leading-tight">
+              {value}
+            </h3>
           </div>
 
-          {trend !== undefined && (
-            <div className="flex items-center gap-2 mt-auto">
-              <div className={`flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold ${trend > 0 ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'}`}>
-                <TrendingUp size={10} className={trend < 0 ? 'rotate-180' : ''} />
-                {Math.abs(trend)}%
+          <div className="flex items-center justify-between mt-auto">
+            {trend !== undefined && (
+              <div className="flex items-center gap-2">
+                <div className={`flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${trend > 0 ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'}`}>
+                  <TrendingUp size={10} className={trend < 0 ? 'rotate-180' : ''} />
+                  {Math.abs(trend)}%
+                </div>
               </div>
-              <span className="text-[11px] text-foreground/30 font-medium lowercase italic whitespace-nowrap">{t('dash.vsLastMonth')}</span>
-            </div>
-          )}
+            )}
+            <button 
+              onClick={handleAIClick}
+              className="p-1.5 rounded-lg bg-primary/10 text-primary opacity-0 group-hover/card:opacity-100 hover:bg-primary hover:text-white transition-all shadow-lg"
+              title="Ask AI"
+            >
+              <Sparkles size={12} />
+            </button>
+          </div>
         </div>
 
         {/* Back */}
@@ -220,11 +220,11 @@ function DashboardView() {
           )}
 
           {!summary ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 shrink-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 shrink-0">
               <KPISkeleton /> <KPISkeleton /> <KPISkeleton /> <KPISkeleton /> <KPISkeleton />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8 shrink-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8 shrink-0">
               <KPICard title={t('dash.revenue')} value={summary?.total_revenue || "—"} icon={TrendingUp} trend={+12.5} color="success" t={t} granularity={granularity} details={summary?.revenue_breakdown} lang={lang} />
               <KPICard title={t('dash.users')} value={summary?.active_users || "—"} icon={Users} trend={+5.2} color="primary" t={t} granularity={granularity} lang={lang} />
               <KPICard title={t('dash.engagement')} value={summary?.engagement_score || "—"} icon={Activity} trend={+1.2} color="secondary" t={t} granularity={granularity} lang={lang} />
