@@ -46,6 +46,7 @@ export const askAI = async (question: string, language: string = 'en') => {
 
 export const fetchMLMetrics = () => fetchWithAuth(`${API_URL}/ml/metrics`);
 export const fetchChurnScores = () => fetchWithAuth(`${API_URL}/ml/churn-scores`);
+export const fetchChurnDistribution = () => fetchWithAuth(`${API_URL}/ml/churn-distribution`);
 export const fetchSegments = () => fetchWithAuth(`${API_URL}/ml/segments`);
 export const triggerTraining = () => fetchWithAuth(`${API_URL}/ml/train`, { method: 'POST' });
 export const fetchRevenueTrend = (g = "month") => fetchWithAuth(`${API_URL}/analytics/revenue-trend?granularity=${g}`);

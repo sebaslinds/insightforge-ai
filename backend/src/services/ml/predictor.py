@@ -115,3 +115,21 @@ def get_ml_metrics() -> Dict:
         "xgboost": {"accuracy": None, "status": "not_trained"},
         "kmeans":  {"silhouette": None, "status": "not_trained"},
     }
+
+def get_churn_distribution() -> List[Dict]:
+    """Retourne la distribution des scores de churn par buckets de 10%."""
+    xgb, _, _ = _load_models()
+    df = load_features_from_db()
+    
+    for col in FEATURE_COLS + ["plan_encoded"]:
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+        
+    X = df[FEATURE_COLS + ["plan_encoded"]]
+    probs = xgb.predict_proba(X)[:, 1]
+    
+    # Bucketizing par déciles
+    bins = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    labels = ["0-10%", "10-20%", "20-30%", "30-40%", "40-50%", "50-60%", "60-70%", "70-80%", "80-90%", "90-100%"]
+    dist = pd.cut(probs, bins=bins, labels=labels, include_lowest=True).value_counts().sort_index()
+    
+    return [{"name": k, "count": int(v)} for k, v in dist.items()]

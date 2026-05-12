@@ -1,6 +1,6 @@
 from fastapi import APIRouter, BackgroundTasks, Depends
 from fastapi.responses import StreamingResponse
-from services.ml.predictor import get_churn_scores, get_segments, get_ml_metrics
+from services.ml.predictor import get_churn_scores, get_segments, get_ml_metrics, get_churn_distribution
 from services.ml.recommender import get_personalized_recommendation
 from core.database import SessionLocal, get_db
 from core.models import RecommendationFeedback
@@ -17,6 +17,11 @@ router = APIRouter()
 def churn_scores():
     """Top 50 users par risque de churn."""
     return get_churn_scores()
+
+@router.get("/churn-distribution")
+def churn_distribution():
+    """Distribution globale du risque de churn."""
+    return get_churn_distribution()
 
 @router.get("/segments")
 def segments():

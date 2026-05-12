@@ -7,7 +7,7 @@ import Sidebar from "./components/Sidebar";
 import Modal from "./components/Modal";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Brush, BarChart, Bar } from 'recharts';
 import { LanguageProvider, useLanguage, THEME_COLORS } from "@/lib/i18n";
-import { fetchMLMetrics, fetchChurnScores, fetchSegments, triggerTraining, fetchRevenueTrend, fetchSummary, suggestRules, generateReport, fetchRules, deleteRule, login, fetchNotifications, markNotificationRead, triggerDemoNotifications, clearNotifications, fetchRecommendation, triggerRecommendationCampaign, fetchConversions, fetchCohorts, sendRecommendationFeedback } from "@/lib/api";
+import { fetchMLMetrics, fetchChurnScores, fetchSegments, triggerTraining, fetchRevenueTrend, fetchSummary, suggestRules, generateReport, fetchRules, deleteRule, login, fetchNotifications, markNotificationRead, triggerDemoNotifications, clearNotifications, fetchRecommendation, triggerRecommendationCampaign, fetchConversions, fetchCohorts, sendRecommendationFeedback, fetchChurnDistribution } from "@/lib/api";
 
 
 function KPICard({ title, value, icon: Icon, trend, color, t, granularity, details, lang }: any) {
@@ -455,7 +455,7 @@ function DashboardView() {
 }
 
 function SegmentsView() {
-  const { t, theme } = useLanguage();
+  const { t, theme, lang } = useLanguage();
   const colors = THEME_COLORS[theme] || THEME_COLORS.midnight;
   const [segments, setSegments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -485,7 +485,18 @@ function SegmentsView() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {segments.map((seg, idx) => (
-          <div key={seg?.name || idx} className="glass-panel p-6 border-l-4 flex flex-col justify-between" style={{ borderLeftColor: SEGMENT_COLORS[seg?.name] || colors.primary }}>
+          <div 
+            key={seg?.name || idx} 
+            className="glass-panel p-6 border-l-4 flex flex-col justify-between cursor-pointer hover:bg-primary/5 transition-all group/tile" 
+            style={{ borderLeftColor: SEGMENT_COLORS[seg?.name] || colors.primary }}
+            onClick={() => {
+              const name = (seg?.name || '').replace('_', ' ');
+              const query = lang === 'fr' 
+                ? `Donne-moi une analyse détaillée du segment ${name}. Quelles sont les caractéristiques clés de ces utilisateurs et les actions recommandées ?`
+                : `Give me a detailed analysis of the ${name} segment. What are the key characteristics of these users and the recommended actions?`;
+              window.dispatchEvent(new CustomEvent('insightforge-query', { detail: query }));
+            }}
+          >
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="text-xl font-bold mb-1 capitalize">{(seg?.name || '').replace('_', ' ')}</h3>
@@ -567,15 +578,32 @@ function MLView() {
   const { t, lang } = useLanguage();
   const [metrics, setMetrics] = useState<any>(null);
   const [churnScores, setChurnScores] = useState<any[]>([]);
+  const [churnDist, setChurnDist] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isTraining, setIsTraining] = useState(false);
 
   useEffect(() => {
-    fetchMLMetrics().then(setMetrics).catch(() => {});
-    fetchChurnScores()
-      .then(data => Array.isArray(data) ? setChurnScores(data) : setChurnScores([]))
-      .catch(() => setChurnScores([]))
-      .finally(() => setLoading(false));
+    Promise.all([
+      fetchMLMetrics().then(setMetrics),
+      fetchChurnScores().then(data => setChurnScores(Array.isArray(data) ? data : [])),
+      fetchChurnDistribution().then(data => setChurnDist(Array.isArray(data) ? data : []))
+    ]).finally(() => setLoading(false));
   }, []);
+
+  const handleRetrain = async () => {
+    setIsTraining(true);
+    try {
+      await triggerTraining();
+      // On attend un peu que le background task finisse ou mette à jour le JSON
+      setTimeout(() => {
+        fetchMLMetrics().then(setMetrics);
+        setIsTraining(false);
+      }, 2000);
+    } catch (e) {
+      console.error(e);
+      setIsTraining(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -584,8 +612,13 @@ function MLView() {
           <h1 className="text-3xl font-bold mb-2 text-foreground">{t('ml.title')}</h1>
           <p className="text-foreground/60">{t('ml.subtitle')}</p>
         </div>
-        <button onClick={() => triggerTraining()} className="glass-button px-4 py-2 rounded-lg flex items-center gap-2">
-          <RefreshCw size={18} /> {t('ml.retrain')}
+        <button 
+          onClick={handleRetrain} 
+          disabled={isTraining}
+          className={`glass-button px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${isTraining ? 'opacity-70 cursor-not-allowed bg-primary/20' : ''}`}
+        >
+          <RefreshCw size={18} className={isTraining ? 'animate-spin' : ''} /> 
+          {isTraining ? (lang === 'fr' ? 'Entraînement...' : 'Training...') : t('ml.retrain')}
         </button>
       </div>
 
@@ -643,38 +676,46 @@ function MLView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="glass-panel p-6">
-          <div className="mb-6">
-            <h3 className="font-semibold">{t('ml.churnPred')}</h3>
-            <p className="text-[10px] text-foreground/40 mt-1">{t('ml.churnPredDesc')}</p>
+          <div className="mb-6 flex justify-between items-start">
+            <div>
+              <h3 className="font-semibold">{t('ml.churnPred')}</h3>
+              <p className="text-[10px] text-foreground/40 mt-1">{lang === 'fr' ? 'Distribution globale du risque de churn sur 4,250+ utilisateurs.' : 'Global churn risk distribution across 4,250+ users.'}</p>
+            </div>
+            <div className="text-[10px] font-bold text-primary uppercase tracking-wider">{t('dash.overview')}</div>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={churnScores.slice(0, 20)}>
+              <AreaChart data={churnDist}>
+                <defs>
+                  <linearGradient id="colorChurn" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--foreground-rgb), 0.1)" vertical={false} />
-                <XAxis dataKey="user_id" tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 8}} stroke="rgba(var(--foreground-rgb), 0.3)" interval="preserveStartEnd" />
+                <XAxis dataKey="name" tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 9}} stroke="rgba(var(--foreground-rgb), 0.3)" />
                 <YAxis stroke="rgba(var(--foreground-rgb), 0.3)" tick={{fill: 'rgba(var(--foreground-rgb), 0.6)', fontSize: 10}} width={30} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--card-border)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
                   itemStyle={{ color: 'var(--foreground)' }}
-                  cursor={{fill: 'var(--foreground)', fillOpacity: 0.05}}
-                  formatter={(value: any) => `${(Number(value) * 100).toFixed(1)}%`}
+                  formatter={(value: any) => [`${value} ${t('dash.users')}`, 'Population']}
                 />
-                <Bar 
-                  dataKey="churn_score" 
-                  radius={[6, 6, 0, 0]} 
-                  className="cursor-pointer transition-all duration-300 hover:opacity-80"
-                  onClick={(data: any) => {
-                    const query = lang === 'fr'
-                      ? `Analyse le score de churn pour l'utilisateur ${data.user_id}. Pourquoi est-il de ${(data.churn_score * 100).toFixed(1)}% ?`
-                      : `Analyze the churn score for user ${data.user_id}. Why is it ${(data.churn_score * 100).toFixed(1)}%?`;
+                <Area 
+                  type="monotone" 
+                  dataKey="count" 
+                  stroke="#ef4444" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorChurn)"
+                  className="cursor-pointer"
+                  onClick={(data) => {
+                    const query = lang === 'fr' 
+                      ? `Pourquoi avons-nous ${data.count} utilisateurs dans la tranche de risque ${data.name} ? Quels sont les facteurs ?`
+                      : `Why do we have ${data.count} users in the ${data.name} risk bucket? What are the drivers?`;
                     window.dispatchEvent(new CustomEvent('insightforge-query', { detail: query }));
                   }}
-                >
-                  {churnScores.slice(0, 20).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.churn_score > 0.7 ? '#ef4444' : entry.churn_score > 0.4 ? '#f59e0b' : '#10b981'} />
-                  ))}
-                </Bar>
-              </BarChart>
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
