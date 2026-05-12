@@ -417,7 +417,7 @@ function DashboardView() {
                       dataKey="value"
                       stroke="none"
                       className="cursor-pointer outline-none"
-                      onClick={(data) => {
+                      onClick={(data: any) => {
                         const name = data.name;
                         const query = lang === 'fr' 
                           ? `Donne-moi une analyse détaillée du segment ${name}. Quelles sont les actions recommandées ?`
@@ -745,7 +745,7 @@ function MLView() {
                   fillOpacity={1} 
                   fill="url(#colorChurn)"
                   className="cursor-pointer"
-                  onClick={(data) => {
+                  onClick={(data: any) => {
                     const query = lang === 'fr' 
                       ? `Pourquoi avons-nous ${data.count} utilisateurs dans la tranche de risque ${data.name} ? Quels sont les facteurs ?`
                       : `Why do we have ${data.count} users in the ${data.name} risk bucket? What are the drivers?`;
