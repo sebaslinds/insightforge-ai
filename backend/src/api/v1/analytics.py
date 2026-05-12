@@ -367,7 +367,6 @@ def _get_cohorts_data(current_user: AdminUser, db: Session):
 @router.get("/generate-report")
 def generate_report(lang: str = Query("en"), current_user: AdminUser = Depends(get_current_user), db: Session = Depends(get_db)):
     from services.ml.predictor import get_ml_metrics
-    print(f"[DEBUG] generate_report lang received: {lang}")
     
     users = db.query(User).filter(User.tenant_id == current_user.tenant_id).all()
     total_users = len(users)

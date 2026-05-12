@@ -42,12 +42,12 @@ function KPICard({ title, value, icon: Icon, trend, color, t, granularity, detai
         {/* Front */}
         <div className="flip-card-front glass-panel p-5 flex flex-col justify-between group-hover/card:border-primary/50 transition-all overflow-hidden absolute w-full h-full backface-hidden">
           <div className="flex flex-col gap-2">
-            <div className="flex justify-between items-start">
-              <p className="text-[8.5px] uppercase font-black text-foreground/40 tracking-wider mb-0 whitespace-normal leading-tight" title={title}>
+            <div className="flex justify-between items-center gap-3">
+              <p className="text-[10px] uppercase font-bold text-foreground/40 tracking-widest leading-tight" title={title}>
                 {title}
               </p>
-              <div className={`p-2 rounded-xl bg-foreground/5 border border-card-border/50 text-${color} shadow-sm shrink-0`}>
-                <Icon size={16} />
+              <div className={`p-2.5 rounded-2xl bg-${color}/10 border border-${color}/20 text-${color} shadow-sm shrink-0 transition-all group-hover/card:scale-110 group-hover/card:rotate-3`}>
+                <Icon size={20} />
               </div>
             </div>
             
@@ -185,7 +185,6 @@ function DashboardView() {
   };
 
   const handleGenerateReport = async () => {
-    console.log("[DEBUG] Generating report with lang:", lang);
     const res = await generateReport(lang);
     setReport(res.report);
   };
@@ -277,7 +276,7 @@ function DashboardView() {
                         </div>
                         <h4 className="text-2xl font-bold text-foreground text-glow">75.5%</h4>
                       </div>
-                      <div className="p-2 bg-primary/20 rounded-lg text-primary"><Brain size={20}/></div>
+                      <div className="p-2.5 bg-primary/20 rounded-2xl text-primary border border-primary/20 transition-all group-hover:scale-110"><Brain size={24}/></div>
                    </div>
                    <div className="space-y-2">
                       <div className="flex justify-between text-[10px] font-bold">
@@ -301,7 +300,7 @@ function DashboardView() {
                         </div>
                         <h4 className="text-2xl font-bold text-foreground text-glow">64.2%</h4>
                       </div>
-                      <div className="p-2 bg-success/20 rounded-lg text-success"><RefreshCw size={20}/></div>
+                      <div className="p-2.5 bg-success/20 rounded-2xl text-success border border-success/20 transition-all group-hover:scale-110"><RefreshCw size={24}/></div>
                    </div>
                    <div className="space-y-2">
                       <div className="flex justify-between text-[10px] font-bold">
