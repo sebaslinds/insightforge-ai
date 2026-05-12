@@ -43,7 +43,7 @@ function KPICard({ title, value, icon: Icon, trend, color, t, granularity, detai
         <div className="flip-card-front glass-panel p-4 flex flex-col justify-between group-hover/card:border-primary/50 transition-all overflow-hidden absolute w-full h-full backface-hidden">
           <div className="flex justify-between items-start">
             <div className="flex-1 min-w-0 pr-2">
-              <p className="text-[10px] uppercase font-bold text-foreground/40 tracking-widest mb-1 whitespace-normal break-words" title={title}>
+              <p className="text-[8.5px] uppercase font-black text-foreground/40 tracking-tight mb-1 whitespace-normal leading-tight min-h-[20px]" title={title}>
                 {title}
               </p>
               <h3 className="text-xl font-black text-foreground tracking-tight whitespace-nowrap">
@@ -153,6 +153,37 @@ function DashboardView() {
       .finally(() => setLoadingTrend(false));
   }, [granularity]);
 
+  const exportToPDF = () => {
+    if (!report) return;
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>InsightForge Report</title>
+            <style>
+              body { font-family: sans-serif; padding: 40px; color: #111827; line-height: 1.6; background: #fff; }
+              .header { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; border-bottom: 2px solid #007db8; padding-bottom: 15px; }
+              .logo { font-weight: 800; font-size: 24px; color: #007db8; letter-spacing: -0.025em; }
+              pre { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background: #f9fafb; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; font-size: 13px; color: #374151; }
+              .footer { margin-top: 40px; font-size: 11px; color: #9ca3af; text-align: center; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <div class="logo">InsightForge AI</div>
+              <div style="margin-left: auto; font-size: 12px; color: #6b7280;">Analytical Engine v1.4</div>
+            </div>
+            <pre>${report}</pre>
+            <div class="footer">© ${new Date().getFullYear()} InsightForge Personalization Engine. Confidential and Proprietary.</div>
+            <script>window.onload = () => { setTimeout(() => { window.print(); window.close(); }, 500); }</script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+  };
+
   const handleGenerateReport = async () => {
     const res = await generateReport();
     setReport(res.report);
@@ -174,11 +205,17 @@ function DashboardView() {
 
           {report && (
             <div className="glass-panel p-6 border-primary/30 bg-primary/5 animate-in slide-in-from-top duration-500 shrink-0">
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-bold flex items-center gap-2"><Sparkles className="text-primary" /> {t('dash.reportGenerated')}</h3>
-                <button onClick={() => setReport(null)} className="text-foreground/40 hover:text-primary">{t('dash.close')}</button>
+                <div className="flex items-center gap-2">
+                  <button onClick={exportToPDF} className="p-2 rounded-lg bg-foreground/5 hover:bg-primary/20 text-foreground/60 hover:text-primary transition-all flex items-center gap-2 text-xs font-bold border border-card-border">
+                    <Download size={14} /> {t('dash.exportPDF')}
+                  </button>
+                  <div className="w-px h-6 bg-card-border mx-1" />
+                  <button onClick={() => setReport(null)} className="text-foreground/40 hover:text-danger p-2 transition-colors">{t('dash.close')}</button>
+                </div>
               </div>
-              <pre className="whitespace-pre-wrap text-sm text-foreground/80 font-mono bg-black/20 p-4 rounded-lg">{report}</pre>
+              <pre className="whitespace-pre-wrap text-[13px] text-foreground/80 font-mono bg-black/40 p-6 rounded-xl border border-card-border leading-relaxed shadow-inner max-h-[400px] overflow-y-auto custom-scrollbar">{report}</pre>
             </div>
           )}
 

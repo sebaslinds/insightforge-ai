@@ -163,6 +163,7 @@ export default function AICopilot() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [carbonFootprint, setCarbonFootprint] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -208,6 +209,10 @@ export default function AICopilot() {
     try {
       const response = await askAI(userMessage.content, lang);
       
+      if (response.total_carbon_footprint) {
+        setCarbonFootprint(response.total_carbon_footprint);
+      }
+      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "ai",
@@ -247,9 +252,17 @@ export default function AICopilot() {
 
   return (
     <div className="flex flex-col h-full glass-panel overflow-hidden">
-      <div className="p-3 border-b border-card-border bg-foreground/5 flex items-center space-x-2">
-        <Bot style={{ color: 'var(--primary)' }} size={20} />
-        <h3 className="font-semibold text-base">{t('copilot.header')}</h3>
+      <div className="p-3 border-b border-card-border bg-foreground/5 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Bot style={{ color: 'var(--primary)' }} size={20} />
+          <h3 className="font-semibold text-base">{t('copilot.header')}</h3>
+        </div>
+        {carbonFootprint && (
+          <div className="flex items-center gap-1.5 text-[10px] font-bold text-success/70 bg-success/5 px-2 py-1 rounded-full border border-success/10 animate-in fade-in zoom-in duration-500" title={lang === 'fr' ? 'Empreinte cumulée' : 'Accumulated footprint'}>
+            <span>🌱</span>
+            <span>{lang === 'fr' ? 'Accumulée' : 'Total'}: {carbonFootprint.toFixed(3)}g CO2e</span>
+          </div>
+        )}
       </div>
       
       <div className="flex-1 overflow-y-auto p-3 space-y-4 custom-scrollbar">

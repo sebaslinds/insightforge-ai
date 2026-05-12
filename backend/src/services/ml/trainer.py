@@ -19,6 +19,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import RobustScaler
+from sklearn.decomposition import PCA
 
 from services.ml.feature_engineering import load_features_from_db, FEATURE_COLS
 from core.database import SessionLocal
@@ -74,14 +76,20 @@ def train_segmentation_model(df):
     X = df[FEATURE_COLS].copy()
     X = X.fillna(0)
 
-    scaler = StandardScaler()
+    # RobustScaler est plus resistant aux outliers que StandardScaler
+    scaler = RobustScaler()
     X_scaled = scaler.fit_transform(X)
 
-    kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
-    labels = kmeans.fit_predict(X_scaled)
+    # PCA aide a reduire le bruit et a mieux separer les clusters
+    pca = PCA(n_components=3, random_state=42)
+    X_pca = pca.fit_transform(X_scaled)
 
-    sil = silhouette_score(X_scaled, labels)
-    print(f"  [OK] Silhouette Score : {sil:.4f}")
+    # KMeans avec meilleure initialisation
+    kmeans = KMeans(n_clusters=4, random_state=42, n_init=20, init='k-means++')
+    labels = kmeans.fit_predict(X_pca)
+
+    sil = silhouette_score(X_pca, labels)
+    print(f"  [OK] Silhouette Score (PCA) : {sil:.4f}")
 
     cluster_counts = np.bincount(labels)
     for i, count in enumerate(cluster_counts):
@@ -89,10 +97,14 @@ def train_segmentation_model(df):
 
     joblib.dump(kmeans, KMEANS_PATH)
     joblib.dump(scaler, SCALER_PATH)
+    joblib.dump(pca, MODELS_DIR / "pca.pkl")
+    
     upload_model_to_gcs(str(KMEANS_PATH), "models/kmeans_model.pkl")
     upload_model_to_gcs(str(SCALER_PATH), "models/scaler.pkl")
-    print(f"  [SAVED] kmeans_model.pkl + scaler.pkl -> {KMEANS_PATH.parent}")
-    return kmeans, scaler, sil
+    upload_model_to_gcs(str(MODELS_DIR / "pca.pkl"), "models/pca.pkl")
+    
+    print(f"  [SAVED] kmeans + scaler + pca -> {KMEANS_PATH.parent}")
+    return kmeans, scaler, pca, sil
 
 if __name__ == "__main__":
     print("[START] Chargement des features depuis PostgreSQL...")
@@ -100,7 +112,7 @@ if __name__ == "__main__":
     print(f"  [OK] {len(df)} users charges.")
 
     model, acc, feat_imp  = train_churn_model(df)
-    kmeans, scaler, sil = train_segmentation_model(df)
+    kmeans, scaler, pca, sil = train_segmentation_model(df)
 
     # Sauvegarder les metriques pour l'API
     metrics = {
@@ -121,8 +133,10 @@ if __name__ == "__main__":
     db = SessionLocal()
     try:
         # PrAdiction des segments finaux pour tous les utilisateurs
-        X_scaled = scaler.transform(df[FEATURE_COLS])
-        df["cluster"] = kmeans.predict(X_scaled)
+        X_feats = df[FEATURE_COLS]
+        X_scaled = scaler.transform(X_feats)
+        X_pca = pca.transform(X_scaled)
+        df["cluster"] = kmeans.predict(X_pca)
         
         # Mapping dynamique (identique A predictor.py)
         cluster_stats = df.groupby("cluster")["engagement_score"].mean().sort_values(ascending=False)
@@ -134,18 +148,19 @@ if __name__ == "__main__":
         df["churn_score"] = model.predict_proba(X_xgb)[:, 1]
         
         # Mise A jour par lots (bulk update) pour la performance
-        updated = 0
-        for _, row in df.iterrows():
-            db.execute(
-                text("UPDATE users SET segment = :seg, churn_score = :churn WHERE user_id = :uid"),
-                {"seg": row["segment_name"], "churn": float(row["churn_score"]), "uid": row["user_id"]}
-            )
-            updated += 1
-            if updated % 1000 == 0:
-                db.commit()
-                print(f"  - {updated} utilisateurs synchronisAs...")
+        print(f"  [DB] Synchronisation de {len(df)} utilisateurs...")
+        update_data = [
+            {"seg": row["segment_name"], "churn": float(row["churn_score"]), "uid": row["user_id"]}
+            for _, row in df.iterrows()
+        ]
+        
+        # Utilisation de bindparam pour une mise a jour groupée efficace
+        db.execute(
+            text("UPDATE users SET segment = :seg, churn_score = :churn WHERE user_id = :uid"),
+            update_data
+        )
         db.commit()
-        print(f"  [OK] {updated} utilisateurs mis A jour dans la base.")
+        print(f"  [OK] {len(df)} utilisateurs mis A jour dans la base.")
     except Exception as e:
         print(f"  [ERROR] Erreur persistence : {e}")
         db.rollback()

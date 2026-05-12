@@ -4,7 +4,7 @@ Modèles SQLAlchemy pour le multi-tenant : Tenant + ApiKey.
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -20,6 +20,7 @@ class Tenant(Base):
     plan       = Column(String(20),  nullable=False, default="free")  # free/pro/enterprise
     created_at = Column(DateTime, default=datetime.utcnow)
     is_active  = Column(Boolean, default=True)
+    total_carbon_footprint = Column(Float, default=0.0)
 
     api_keys = relationship("ApiKey", back_populates="tenant", cascade="all, delete-orphan")
 

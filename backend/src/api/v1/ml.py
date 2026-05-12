@@ -50,7 +50,7 @@ def train_models(background_tasks: BackgroundTasks):
         # 2. Charger les données et entraîner
         df = load_features_from_db()
         model, acc, feat_imp = train_churn_model(df)
-        _, _, sil            = train_segmentation_model(df)
+        _, _, _, sil            = train_segmentation_model(df)
 
         metrics = {
             "xgboost": {

@@ -20,12 +20,13 @@
 6. **AI Copilot** 🤖
    - Generative AI assistant powered by **OpenAI GPT-4o** with dynamic Text-to-SQL capabilities, allowing executives to chat directly with their SaaS data.
 
-## ✨ Latest Features (v1.3.8)
+## ✨ Latest Features (v1.4.0)
 
-- **Stabilized AI Copilot** 🤖: Enhanced response precision using global data summaries and strict conciseness constraints (max 150 words).
-- **Interactive AI Charts** 📊: Click on any bar or retention cell to trigger an automated, deep-dive analysis with stable Recharts visualizations.
-- **Improved UX & Readability** 📑: Full visibility for all KPI titles (no truncation) and systematic completion of AI sentences.
-- **High-Precision Data Summary** 📈: The AI Copilot now utilizes real-time statistical aggregates from the entire PostgreSQL dataset (6,000+ users), ensuring accurate counts and distributions in chat responses.
+- **Executive Analytical Reporting** 📋: A comprehensive overview of the entire SaaS platform, aggregating Business KPIs, ML performance indicators (Accuracy, Silhouette), and Dynamic Retention analysis in one place.
+- **High-Quality PDF Export** 📄: Generate professional, print-ready PDF reports with a single click, featuring a clean, branded McKinsey-style layout.
+- **Persistent Carbon Footprint Tracking** 🌱: Real-time calculation and historical accumulation of the environmental impact of AI queries, visible directly in the Copilot header.
+- **UI/UX Refinement** 🎨: Optimized KPI cards for multi-language support (French alignment fix) and enhanced "McKinsey Style" density for executive decision-making.
+- **Advanced Cohort Analysis** 📉: Real-time retention trend calculation integrated into the executive reporting module.
 
 ## 🧠 Tech Stack
 

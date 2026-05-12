@@ -9,11 +9,14 @@ from typing import List, Dict
 
 from services.ml.feature_engineering import FEATURE_COLS, load_features_from_db
 from services.storage_service import download_model_from_gcs
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import RobustScaler
 
 MODELS_DIR  = Path(__file__).parent / "models"
 XGB_PATH    = MODELS_DIR / "churn_model.pkl"
 KMEANS_PATH = MODELS_DIR / "kmeans_model.pkl"
 SCALER_PATH = MODELS_DIR / "scaler.pkl"
+PCA_PATH    = MODELS_DIR / "pca.pkl"
 
 SEGMENT_MAP = {0: "power_user", 1: "casual", 2: "at_risk", 3: "dormant"}
 
@@ -25,18 +28,19 @@ def _load_models():
         download_model_from_gcs("models/kmeans_model.pkl", str(KMEANS_PATH))
         download_model_from_gcs("models/scaler.pkl", str(SCALER_PATH))
 
-    if not XGB_PATH.exists():
-        raise FileNotFoundError("Modèles introuvables sur GCS ou localement.")
-        
+    if not PCA_PATH.exists():
+        download_model_from_gcs("models/pca.pkl", str(PCA_PATH))
+
     return (
         joblib.load(XGB_PATH),
         joblib.load(KMEANS_PATH),
         joblib.load(SCALER_PATH),
+        joblib.load(PCA_PATH),
     )
 
 def get_churn_scores() -> List[Dict]:
     """Retourne les scores de churn XGBoost pour tous les users."""
-    xgb, _, _ = _load_models()
+    xgb, _, _, _ = _load_models()
     df = load_features_from_db()
     
     # Correction : Forcer la conversion numérique pour éviter ValueError
@@ -55,14 +59,15 @@ def get_churn_scores() -> List[Dict]:
 
 def get_segments() -> List[Dict]:
     """Retourne les segments K-Means pour tous les users avec mapping dynamique."""
-    _, kmeans, scaler = _load_models()
+    _, kmeans, scaler, pca = _load_models()
     df = load_features_from_db()
     
     for col in FEATURE_COLS:
         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
         
     X_scaled = scaler.transform(df[FEATURE_COLS])
-    df["cluster"] = kmeans.predict(X_scaled)
+    X_pca = pca.transform(X_scaled)
+    df["cluster"] = kmeans.predict(X_pca)
 
     # Calculer le score moyen par cluster pour mapper dynamiquement
     cluster_stats = df.groupby("cluster")["engagement_score"].mean().sort_values(ascending=False)
@@ -118,7 +123,7 @@ def get_ml_metrics() -> Dict:
 
 def get_churn_distribution() -> List[Dict]:
     """Retourne la distribution des scores de churn par buckets de 10%."""
-    xgb, _, _ = _load_models()
+    xgb, _, _, _ = _load_models()
     df = load_features_from_db()
     
     for col in FEATURE_COLS + ["plan_encoded"]:

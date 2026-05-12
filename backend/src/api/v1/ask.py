@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from core.database import get_db
 from schemas.ask import AskRequest
 from core.security import get_current_user
-from core.tenant_models import AdminUser
+from core.tenant_models import AdminUser, Tenant
 from services.ai.ai_service import generate_sql, generate_insight
 from services.query.query_service import run_query
 from services.decision.engine import make_decisions
@@ -12,69 +14,66 @@ import pandas as pd
 router = APIRouter()
 
 @router.post("/")
-async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_user)):
+async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_user), db: Session = Depends(get_db)):
     # 1. SQL generation via GPT-4o (Text-to-SQL)
     sql = await generate_sql(req.question)
 
     # 2. Data query depuis PostgreSQL avec filtrage tenant
     data = run_query(sql, {"tenant_id": current_user.tenant_id})
 
-    # 3. Anomaly detection simple (revenue_usd est le nom de colonne correct)
+    # 3. Anomaly detection simple
     anomalies = [1000] if any(d.get("revenue_usd", 0) > 500 for d in data) else []
 
     # 4. Decision Engine
     decisions = make_decisions(data, anomalies)
 
-    # 5. Data Summary pour l'IA (éviter de tronquer arbitrairement)
+    # 5. Data Summary
     df = pd.DataFrame(data)
     data_summary = ""
     if not df.empty:
-        # Nettoyage des valeurs manquantes pour éviter 'NaN' dans l'IA
         df = df.fillna("non_catégorisé")
         if len(df) > 50:
-            # Si trop de données, on donne un résumé statistique par colonne
             data_summary = f"Total records: {len(df)}\n"
             for col in df.columns:
                 if pd.api.types.is_numeric_dtype(df[col]):
                     data_summary += f"- {col}: mean={df[col].mean():.2f}, min={df[col].min()}, max={df[col].max()}\n"
-                    # Ajout d'une distribution par tranches de 10 pour les scores
-                    if "score" in col.lower():
-                        bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-                        dist = pd.cut(df[col], bins=bins).value_counts().sort_index()
-                        data_summary += f"  Distribution {col}: {dist.to_dict()}\n"
                 else:
-                    data_summary += f"- {col}: unique_values={df[col].nunique()}, top_values={df[col].value_counts().head(10).to_dict()}\n"
+                    data_summary += f"- {col}: unique_values={df[col].nunique()}\n"
         else:
             data_summary = df.to_string()
 
-    # 6. AI Explanation via GPT-4o (async)
+    # 6. AI Explanation
     payload = {
         "question": req.question,
         "decisions": decisions,
         "data_summary": data_summary,
-        "ml_metrics": get_ml_metrics(), # Importance des features
+        "ml_metrics": get_ml_metrics(),
         "sql": sql,
     }
     explanation = await generate_insight(payload, req.language)
 
-    # 6. Auto Execution
+    # 7. Auto Execution
     execution_results = execute_decisions(decisions)
 
-    # 7. Follow-ups contextuels
+    # 8. Follow-ups
     if req.language == "fr":
-        follow_ups = [
-            "Pouvez-vous détailler les revenus par segment ?",
-            "Quels sont les principaux facteurs d'attrition ?",
-            "Montrez-moi les anomalies récentes en détail.",
-            "Quels utilisateurs sont à risque élevé de churn ?",
-        ]
+        follow_ups = ["Détails par segment ?", "Facteurs d'attrition ?", "Anomalies récentes ?", "Risque churn élevé ?"]
     else:
-        follow_ups = [
-            "Can you break down revenue by segment?",
-            "What are the main drivers of churn?",
-            "Show me recent anomalies in detail.",
-            "Which users are at high churn risk?",
-        ]
+        follow_ups = ["Segment details?", "Churn drivers?", "Recent anomalies?", "High churn risk?"]
+
+    # 9. Calcul Empreinte Carbone
+    row_count = len(data)
+    current_carbon = 0.2 + (row_count / 1000 * 0.05)
+    
+    # Mise à jour de l'accumulé pour le Tenant
+    tenant = db.query(Tenant).filter(Tenant.id == current_user.tenant_id).first()
+    if tenant:
+        current_total = float(tenant.total_carbon_footprint or 0.0)
+        tenant.total_carbon_footprint = current_total + current_carbon
+        db.commit()
+        total_carbon = tenant.total_carbon_footprint
+    else:
+        total_carbon = current_carbon
 
     return {
         "sql": sql,
@@ -83,4 +82,6 @@ async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_use
         "explanation": explanation,
         "execution_results": execution_results,
         "follow_ups": follow_ups,
+        "carbon_footprint": current_carbon,
+        "total_carbon_footprint": total_carbon
     }
