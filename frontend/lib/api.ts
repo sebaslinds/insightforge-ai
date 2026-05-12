@@ -54,7 +54,7 @@ export const fetchSummary = (g = "month") => fetchWithAuth(`${API_URL}/analytics
 export const fetchRules = (lang: string = "en") => fetchWithAuth(`${API_URL}/analytics/rules?lang=${lang}`);
 export const suggestRules = (l = "en") => fetchWithAuth(`${API_URL}/analytics/suggest-rules?lang=${l}`, { method: 'POST' });
 export const deleteRule = (id: number) => fetchWithAuth(`${API_URL}/analytics/rules/${id}`, { method: 'DELETE' });
-export const generateReport = () => fetchWithAuth(`${API_URL}/analytics/generate-report`);
+export const generateReport = (lang: string = "en") => fetchWithAuth(`${API_URL}/analytics/generate-report?lang=${lang}`);
 export const fetchConversions = () => fetchWithAuth(`${API_URL}/analytics/conversions`);
 
 // Notifications

@@ -43,7 +43,7 @@ function KPICard({ title, value, icon: Icon, trend, color, t, granularity, detai
         <div className="flip-card-front glass-panel p-5 flex flex-col justify-between group-hover/card:border-primary/50 transition-all overflow-hidden absolute w-full h-full backface-hidden">
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-start">
-              <p className="text-[9px] uppercase font-black text-foreground/40 tracking-wider mb-0 truncate" title={title}>
+              <p className="text-[8.5px] uppercase font-black text-foreground/40 tracking-wider mb-0 whitespace-normal leading-tight" title={title}>
                 {title}
               </p>
               <div className={`p-2 rounded-xl bg-foreground/5 border border-card-border/50 text-${color} shadow-sm shrink-0`}>
@@ -185,7 +185,8 @@ function DashboardView() {
   };
 
   const handleGenerateReport = async () => {
-    const res = await generateReport();
+    console.log("[DEBUG] Generating report with lang:", lang);
+    const res = await generateReport(lang);
     setReport(res.report);
   };
 
