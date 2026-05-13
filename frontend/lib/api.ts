@@ -69,7 +69,7 @@ export const triggerRecommendationCampaign = (userId: string, feature: string) =
     body: JSON.stringify({ user_id: userId, feature }),
 });
 
-export const fetchCohorts = () => fetchWithAuth(`${API_URL}/analytics/cohorts`);
+export const fetchCohorts = (g = "week") => fetchWithAuth(`${API_URL}/analytics/cohorts?granularity=${g}`);
 
 export const sendRecommendationFeedback = (userId: string, feature: string, isHelpful: boolean) => fetchWithAuth(`${API_URL}/ml/recommendations/feedback`, {
     method: 'POST',

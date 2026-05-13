@@ -89,6 +89,18 @@ function KPICard({ title, value, icon: Icon, trend, color, t, granularity, detai
                 </div>
               ))}
             </div>
+          ) : title.toLowerCase().includes('user') && details?.total_registered ? (
+            <div className="space-y-2 w-full">
+              <div className="flex justify-between text-[11px] text-foreground/90 font-bold border-b border-primary/20 pb-1 mb-1">
+                <span>Total DB:</span>
+                <span>{details.total_registered}</span>
+              </div>
+              <p className="text-[10px] text-foreground/60 leading-tight italic">
+                {lang === 'fr' 
+                  ? "Le chiffre principal montre l'activité réelle (MAU 30j)."
+                  : "Main figure shows real activity (30d MAU)."}
+              </p>
+            </div>
           ) : (
             <p className="text-[13px] text-foreground/90 leading-snug font-medium text-center">
               {title.toLowerCase().includes('revenu') || title.toLowerCase().includes('revenue') ? t('dash.revenueDesc') :
@@ -226,7 +238,7 @@ function DashboardView() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8 shrink-0">
               <KPICard title={t('dash.revenue')} value={summary?.total_revenue || "—"} icon={TrendingUp} trend={+12.5} color="success" t={t} granularity={granularity} details={summary?.revenue_breakdown} lang={lang} />
-              <KPICard title={t('dash.users')} value={summary?.active_users || "—"} icon={Users} trend={+5.2} color="primary" t={t} granularity={granularity} lang={lang} />
+              <KPICard title={t('dash.users')} value={summary?.active_users || "—"} icon={Users} trend={+5.2} color="primary" t={t} granularity={granularity} lang={lang} details={summary} />
               <KPICard title={t('dash.engagement')} value={summary?.engagement_score || "—"} icon={Activity} trend={+1.2} color="secondary" t={t} granularity={granularity} lang={lang} />
               <KPICard title={t('dash.churn')} value={summary?.churn_rate || "—"} icon={AlertTriangle} trend={-2.4} color="danger" t={t} granularity={granularity} lang={lang} />
               <KPICard title={t('dash.cac')} value={summary?.avg_cac || "—"} icon={Target} trend={-4.8} color="warning" t={t} granularity={granularity} lang={lang} />

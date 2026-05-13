@@ -31,13 +31,16 @@ def get_summary(granularity: str = Query("month"), current_user: AdminUser = Dep
         df = pd.DataFrame([{
             "plan": u.plan, 
             "engagement_score": u.engagement_score, 
-            "churned": u.churned
+            "churned": u.churned,
+            "days_since_last_use": u.days_since_last_use
         } for u in users])
         
         total_revenue = sum(df['plan'].map(plan_prices).fillna(0))
-        active_users = len(df)
+        # On définit les utilisateurs actifs comme ceux ayant utilisé l'app dans les 30 derniers jours (MAU)
+        active_users = len(df[df['days_since_last_use'] <= 30])
+        total_registered = len(df)
         avg_engagement = df['engagement_score'].mean()
-        churn_rate = (df['churned'].sum() / active_users * 100)
+        churn_rate = (df['churned'].sum() / total_registered * 100)
         
         # Acquisition cost (CAC)
         avg_cac = sum([u.acquisition_cost for u in users if u.acquisition_cost is not None]) / active_users if active_users > 0 else 0
@@ -52,6 +55,7 @@ def get_summary(granularity: str = Query("month"), current_user: AdminUser = Dep
         return {
             "total_revenue": f"${total_revenue:,.0f}",
             "active_users": f"{active_users:,}",
+            "total_registered": f"{total_registered:,}",
             "engagement_score": f"{avg_engagement:.1f}/100",
             "churn_rate": f"{churn_rate:.1f}%",
             "avg_cac": f"${avg_cac:,.1f}",
@@ -302,45 +306,85 @@ def delete_rule(rule_id: int, current_user: AdminUser = Depends(get_current_user
     db.commit()
     return {"status": "deleted"}
 
-def _get_cohorts_data(current_user: AdminUser, db: Session):
+def _get_cohorts_data(current_user: AdminUser, db: Session, granularity: str = "week"):
     """Logique partagée pour calculer les données de rétention par cohortes."""
     try:
-        limit_date = datetime.utcnow() - timedelta(weeks=16)
-        sql = text("""
-            WITH user_cohorts AS (
-                SELECT user_id, signup_date,
-                       EXTRACT(YEAR FROM signup_date) as signup_year,
-                       EXTRACT(WEEK FROM signup_date) as signup_week
-                FROM users
-                WHERE tenant_id = :tid AND signup_date >= :limit
-            ),
-            event_weeks AS (
-                SELECT e.user_id, 
-                       EXTRACT(YEAR FROM e.timestamp) as event_year,
-                       EXTRACT(WEEK FROM e.timestamp) as event_week
-                FROM events e
-                JOIN user_cohorts u ON e.user_id = u.user_id
-                WHERE e.tenant_id = :tid AND e.timestamp >= :limit
-            ),
-            retention_data AS (
-                SELECT u.signup_year, u.signup_week,
-                       (e.event_year - u.signup_year) * 52 + (e.event_week - u.signup_week) as week_index,
-                       COUNT(DISTINCT e.user_id) as active_users
-                FROM user_cohorts u
-                LEFT JOIN event_weeks e ON u.user_id = e.user_id
-                GROUP BY 1, 2, 3
-            ),
-            cohort_sizes AS (
-                SELECT signup_year, signup_week, COUNT(DISTINCT user_id) as total_users
-                FROM user_cohorts
-                GROUP BY 1, 2
-            )
-            SELECT r.signup_year, r.signup_week, r.week_index, r.active_users, s.total_users
-            FROM retention_data r
-            JOIN cohort_sizes s ON r.signup_year = s.signup_year AND r.signup_week = s.signup_week
-            WHERE r.week_index >= 0
-            ORDER BY r.signup_year DESC, r.signup_week DESC, r.week_index ASC
-        """)
+        # On remonte plus loin pour voir tous les utilisateurs (156 semaines = 3 ans)
+        limit_date = datetime.utcnow() - timedelta(weeks=156)
+        
+        if granularity == "month":
+            sql = text("""
+                WITH user_cohorts AS (
+                    SELECT user_id, signup_date,
+                           EXTRACT(YEAR FROM signup_date) as signup_year,
+                           EXTRACT(MONTH FROM signup_date) as signup_month
+                    FROM users
+                    WHERE tenant_id = :tid AND signup_date >= :limit
+                ),
+                event_months AS (
+                    SELECT e.user_id, 
+                           EXTRACT(YEAR FROM e.timestamp) as event_year,
+                           EXTRACT(MONTH FROM e.timestamp) as event_month
+                    FROM events e
+                    JOIN user_cohorts u ON e.user_id = u.user_id
+                    WHERE e.tenant_id = :tid AND e.timestamp >= :limit
+                ),
+                retention_data AS (
+                    SELECT u.signup_year, u.signup_month,
+                           (e.event_year - u.signup_year) * 12 + (e.event_month - u.signup_month) as month_index,
+                           COUNT(DISTINCT e.user_id) as active_users
+                    FROM user_cohorts u
+                    LEFT JOIN event_months e ON u.user_id = e.user_id
+                    GROUP BY 1, 2, 3
+                ),
+                cohort_sizes AS (
+                    SELECT signup_year, signup_month, COUNT(DISTINCT user_id) as total_users
+                    FROM user_cohorts
+                    GROUP BY 1, 2
+                )
+                SELECT r.signup_year, r.signup_month, r.month_index, r.active_users, s.total_users
+                FROM retention_data r
+                JOIN cohort_sizes s ON r.signup_year = s.signup_year AND r.signup_month = s.signup_month
+                WHERE r.month_index >= 0
+                ORDER BY r.signup_year DESC, r.signup_month DESC, r.month_index ASC
+            """)
+        else:
+            # Pour les semaines, on utilise ISOYEAR et ISO WEEK pour la cohérence Postgres
+            sql = text("""
+                WITH user_cohorts AS (
+                    SELECT user_id, signup_date,
+                           EXTRACT(ISOYEAR FROM signup_date) as signup_year,
+                           EXTRACT(WEEK FROM signup_date) as signup_week
+                    FROM users
+                    WHERE tenant_id = :tid AND signup_date >= :limit
+                ),
+                event_weeks AS (
+                    SELECT e.user_id, 
+                           EXTRACT(ISOYEAR FROM e.timestamp) as event_year,
+                           EXTRACT(WEEK FROM e.timestamp) as event_week
+                    FROM events e
+                    JOIN user_cohorts u ON e.user_id = u.user_id
+                    WHERE e.tenant_id = :tid AND e.timestamp >= :limit
+                ),
+                retention_data AS (
+                    SELECT u.signup_year, u.signup_week,
+                           (e.event_year - u.signup_year) * 52 + (e.event_week - u.signup_week) as week_index,
+                           COUNT(DISTINCT e.user_id) as active_users
+                    FROM user_cohorts u
+                    LEFT JOIN event_weeks e ON u.user_id = e.user_id
+                    GROUP BY 1, 2, 3
+                ),
+                cohort_sizes AS (
+                    SELECT signup_year, signup_week, COUNT(DISTINCT user_id) as total_users
+                    FROM user_cohorts
+                    GROUP BY 1, 2
+                )
+                SELECT r.signup_year, r.signup_week, r.week_index, r.active_users, s.total_users
+                FROM retention_data r
+                JOIN cohort_sizes s ON r.signup_year = s.signup_year AND r.signup_week = s.signup_week
+                WHERE r.week_index >= 0
+                ORDER BY r.signup_year DESC, r.signup_week DESC, r.week_index ASC
+            """)
         
         rows = db.execute(sql, {"tid": current_user.tenant_id, "limit": limit_date}).fetchall()
         
@@ -349,7 +393,11 @@ def _get_cohorts_data(current_user: AdminUser, db: Session):
 
         cohorts = {}
         for row in rows:
-            cohort_key = f"{int(row[0])}-W{int(row[1]):02d}"
+            if granularity == "month":
+                cohort_key = f"{int(row[0])}-M{int(row[1]):02d}"
+            else:
+                cohort_key = f"{int(row[0])}-W{int(row[1]):02d}"
+                
             if cohort_key not in cohorts:
                 cohorts[cohort_key] = {
                     "cohort": cohort_key,
@@ -530,6 +578,6 @@ def get_conversions(current_user: AdminUser = Depends(get_current_user), db: Ses
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/cohorts")
-def get_cohorts(current_user: AdminUser = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_cohorts(granularity: str = Query("week"), current_user: AdminUser = Depends(get_current_user), db: Session = Depends(get_db)):
     """Analyse de rétention par cohortes (Module 6+)."""
-    return _get_cohorts_data(current_user, db)
+    return _get_cohorts_data(current_user, db, granularity)
