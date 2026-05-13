@@ -38,11 +38,15 @@ async def send_slack_alert(message: str, priority: str = "medium") -> dict:
             }
         ]
     }
-    async with httpx.AsyncClient(timeout=10) as client:
-        resp = await client.post(SLACK_WEBHOOK_URL, json=payload)
-        resp.raise_for_status()
-
-    return {"status": "sent", "slack_status": resp.status_code}
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.post(SLACK_WEBHOOK_URL, json=payload)
+            print(f"[SLACK] Alert sent to webhook. Status: {resp.status_code}")
+            resp.raise_for_status()
+        return {"status": "sent", "slack_status": resp.status_code}
+    except Exception as e:
+        print(f"[SLACK] Failed to send alert: {str(e)}")
+        return {"status": "failed", "error": str(e)}
 
 
 # ── Email (Resend) ────────────────────────────────────────────────────────────

@@ -536,8 +536,8 @@ function SegmentsView() {
         {segments.map((seg, idx) => (
           <div 
             key={seg?.name || idx} 
-            className="glass-panel p-6 border-l-4 flex flex-col justify-between cursor-pointer hover:bg-primary/5 transition-all group/tile" 
-            style={{ borderLeftColor: SEGMENT_COLORS[seg?.name] || colors.primary }}
+            className="glass-panel p-6 border-t-2 flex flex-col gap-4 cursor-pointer hover:bg-primary/10 transition-all group/tile relative overflow-hidden" 
+            style={{ borderTopColor: SEGMENT_COLORS[seg?.name] || colors.primary }}
             onClick={() => {
               const name = (seg?.name || '').replace('_', ' ');
               const query = lang === 'fr' 
@@ -546,18 +546,26 @@ function SegmentsView() {
               window.dispatchEvent(new CustomEvent('insightforge-query', { detail: query }));
             }}
           >
-            <div className="flex justify-between items-start">
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover/tile:opacity-30 transition-opacity">
+               {seg?.name === 'power_user' ? <Zap size={40} className="text-primary" /> :
+                seg?.name === 'at_risk' ? <AlertTriangle size={40} className="text-warning" /> :
+                seg?.name === 'dormant' ? <Clock size={40} className="text-danger" /> :
+                <User size={40} className="text-secondary" />}
+            </div>
+            
+            <div className="flex justify-between items-start relative z-10">
               <div>
-                <h3 className="text-xl font-bold mb-1 capitalize">{(seg?.name || '').replace('_', ' ')}</h3>
-                <p className="text-foreground/60 text-[11px] h-8 line-clamp-2 leading-tight">{t(`seg.desc.${seg?.name}`)}</p>
+                <h3 className="text-xl font-black mb-2 capitalize tracking-tight">{(seg?.name || '').replace('_', ' ')}</h3>
+                <p className="text-foreground/80 text-xs leading-relaxed max-w-[85%]">{t(`seg.desc.${seg?.name}`)}</p>
               </div>
-              <div className="p-2 rounded-lg bg-foreground/5 text-foreground/40">
-                {seg?.name === 'power_user' ? <Zap size={18} className="text-primary" /> :
-                 seg?.name === 'at_risk' ? <AlertTriangle size={18} className="text-warning" /> :
-                 seg?.name === 'dormant' ? <Clock size={18} className="text-danger" /> :
-                 <User size={18} className="text-secondary" />}
+              <div className={`p-2 rounded-xl bg-foreground/5 border border-card-border text-foreground/40 group-hover/tile:text-${seg?.name === 'at_risk' ? 'warning' : seg?.name === 'dormant' ? 'danger' : 'primary'} transition-colors`}>
+                {seg?.name === 'power_user' ? <Zap size={18} /> :
+                 seg?.name === 'at_risk' ? <AlertTriangle size={18} /> :
+                 seg?.name === 'dormant' ? <Clock size={18} /> :
+                 <User size={18} />}
               </div>
             </div>
+            
             <div className="mt-4 pt-4 border-t border-card-border flex items-center justify-between">
               <span className="text-[10px] text-foreground/40 uppercase font-bold tracking-tighter">Distribution</span>
               <span className="text-xs font-mono text-primary">{(seg?.percentage || 0).toFixed(1)}%</span>

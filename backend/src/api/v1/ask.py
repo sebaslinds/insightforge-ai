@@ -63,7 +63,7 @@ async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_use
     explanation = await generate_insight(payload, req.language)
 
     # 7. Auto Execution
-    execution_results = execute_decisions(decisions)
+    execution_results = await execute_decisions(decisions)
 
     # 8. Follow-ups
     if req.language == "fr":
