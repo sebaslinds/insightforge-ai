@@ -152,7 +152,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'project.cloudRunDesc': 'Auto-scaling serverless containers hosting the Next.js frontend and FastAPI Python backend.',
     'project.dbDesc': 'Managed PostgreSQL instance storing user events, scores, and segments.',
     'project.dataSeedTitle': 'Live Seeded Data',
-    'project.dataSeedDesc': '6,000+ simulated users generated via seed_cloud.py with realistic ML parameters.',
+    'project.dataSeedDesc': '4,000+ simulated users generated via seed_data.py with realistic ML parameters.',
 
     'login.title': 'Welcome Back',
     'login.subtitle': 'Sign in to access InsightForge Dashboard',
@@ -383,7 +383,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'project.cloudRunDesc': 'Conteneurs serverless à auto-scaling hébergeant le frontend Next.js et le backend FastAPI Python.',
     'project.dbDesc': 'Instance PostgreSQL managée stockant les événements utilisateurs, scores et segments.',
     'project.dataSeedTitle': 'Données Live',
-    'project.dataSeedDesc': '+6000 utilisateurs simulés générés via seed_cloud.py avec des paramètres ML réalistes.',
+    'project.dataSeedDesc': '+4000 utilisateurs simulés générés via seed_data.py avec des paramètres ML réalistes.',
 
     'login.title': 'Bon retour',
     'login.subtitle': 'Connectez-vous pour accéder au dashboard',

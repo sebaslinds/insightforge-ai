@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from core.database import get_db
 from schemas.ask import AskRequest
@@ -42,11 +43,20 @@ async def ask(req: AskRequest, current_user: AdminUser = Depends(get_current_use
         else:
             data_summary = df.to_string()
 
+    # 5. Global Context for perspective
+    global_counts = db.execute(text("SELECT plan, COUNT(*) as count FROM users WHERE tenant_id = :tid GROUP BY plan"), {"tid": current_user.tenant_id}).fetchall()
+    global_stats = {row[0]: row[1] for row in global_counts}
+    total_users_global = sum(global_stats.values())
+
     # 6. AI Explanation
     payload = {
         "question": req.question,
         "decisions": decisions,
         "data_summary": data_summary,
+        "global_stats": {
+            "breakdown": global_stats,
+            "total_users": total_users_global
+        },
         "ml_metrics": get_ml_metrics(),
         "sql": sql,
     }
