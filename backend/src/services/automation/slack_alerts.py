@@ -27,7 +27,7 @@ async def send_slack_alert(message: str, priority: str = "medium") -> dict:
     block_text = f"{emoji} *InsightForge Alert* [{priority.upper()}]\n{message}"
 
     if not SLACK_WEBHOOK_URL:
-        print(f"\n[SLACK MOCK] {block_text}\n")
+        print(f"\n[SLACK MOCK] {block_text.encode('ascii', 'ignore').decode('ascii')}\n")
         return {"status": "mock", "message": block_text}
 
     payload = {
@@ -53,7 +53,7 @@ async def send_email_alert(subject: str, body_html: str) -> dict:
     Fallback console si RESEND_API_KEY non défini.
     """
     if not RESEND_API_KEY:
-        print(f"\n[EMAIL MOCK]\nSubject: {subject}\n{body_html}\n")
+        print(f"\n[EMAIL MOCK]\nSubject: {subject.encode('ascii', 'ignore').decode('ascii')}\n{body_html.encode('ascii', 'ignore').decode('ascii')}\n")
         return {"status": "mock"}
 
     async with httpx.AsyncClient(timeout=10) as client:
