@@ -42,12 +42,12 @@ function KPICard({ title, value, icon: Icon, trend, color, t, granularity, detai
         {/* Front */}
         <div className="flip-card-front glass-panel p-5 flex flex-col justify-between group-hover/card:border-primary/50 transition-all overflow-hidden absolute w-full h-full backface-hidden">
           <div className="flex flex-col gap-2">
-            <div className="flex justify-between items-center gap-3">
-              <p className="text-[10px] uppercase font-bold text-foreground/40 tracking-widest leading-tight" title={title}>
+            <div className="flex justify-between items-start gap-2 mb-1">
+              <p className="text-[9px] uppercase font-bold text-foreground/40 tracking-widest leading-tight flex-1" title={title}>
                 {title}
               </p>
-              <div className={`p-2.5 rounded-2xl bg-${color}/10 border border-${color}/20 text-${color} shadow-sm shrink-0 transition-all group-hover/card:scale-110 group-hover/card:rotate-3`}>
-                <Icon size={20} />
+              <div className={`p-1.5 rounded-xl bg-${color}/10 border border-${color}/20 text-${color} shadow-sm shrink-0 transition-all group-hover/card:scale-110`}>
+                <Icon size={14} />
               </div>
             </div>
             
