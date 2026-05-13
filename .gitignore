@@ -20,3 +20,4 @@ out/
 *.sqlite3
 # Model Logs
 brain/
+scratch/
