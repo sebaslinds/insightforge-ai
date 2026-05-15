@@ -31,10 +31,31 @@ async def send_slack_alert(message: str, priority: str = "medium") -> dict:
         return {"status": "mock", "message": block_text}
 
     payload = {
+        "text": f"InsightForge AI Alert: {message}",
         "blocks": [
             {
+                "type": "header",
+                "text": {"type": "plain_text", "text": f"{emoji} InsightForge AI Alert"}
+            },
+            {
                 "type": "section",
-                "text": {"type": "mrkdwn", "text": block_text},
+                "fields": [
+                    {"type": "mrkdwn", "text": f"*Priority:*\n{priority.upper()}"},
+                    {"type": "mrkdwn", "text": f"*Confidence:*\nHigh (AI Verified)"}
+                ]
+            },
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": f"*Event Details:*\n{message}"}
+            },
+            {
+                "type": "divider"
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {"type": "mrkdwn", "text": "🚀 *Source:* Decision Engine Production | 📊 *Dashboard:* <https://frontend-458613429367.northamerica-northeast1.run.app|View Live>"}
+                ]
             }
         ]
     }

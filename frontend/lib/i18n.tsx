@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 export type Language = 'en' | 'fr';
 
 export const THEME_COLORS: Record<string, { primary: string, secondary: string }> = {
-  midnight: { primary: '#007db8', secondary: '#051c2c' },
+  midnight: { primary: '#007db8', secondary: '#3b82f6' },
   ocean: { primary: '#0ea5e9', secondary: '#2dd4bf' },
   emerald: { primary: '#10b981', secondary: '#84cc16' },
   corporate: { primary: '#3b82f6', secondary: '#64748b' },
